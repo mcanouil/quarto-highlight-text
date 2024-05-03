@@ -1,0 +1,42 @@
+---
+title: "Highlight-text Quarto Extension"
+format:
+  html:
+    output-file: highlight-html
+  typst:
+    output-file: highlight-typst
+  pdf:
+    output-file: highlight-latex
+  docx:
+    output-file: highlight-openxml
+filters:
+  - highlight-text
+---
+
+::: {.content-visible when-format="pdf"}
+## LaTeX / PDF
+
+[Red]{colour="#b22222"}
+[Blue]{color="#0000FF"}
+:::
+
+::: {.content-visible when-format="html"}
+## HTML
+
+[Red]{colour="#b22222"}
+[Blue]{color="#0000FF"}
+:::
+
+::: {.content-visible when-format="typst"}
+## Typst
+
+[Red]{colour="#b22222"}
+[Blue]{color="#0000FF"}
+:::
+
+::: {.content-visible when-format="docx"}
+## Docx
+
+[Red]{colour="#b22222"}
+[Blue]{color="#0000FF"}
+:::
