@@ -33,7 +33,7 @@ Here is the source code for a minimal example: [example.qmd](example.qmd).
 
 This is the output of `example.qmd` for:
 
-- [HTML](https://m.canouil.dev/quarto-iconify/)
-- [LaTeX/PDF](https://m.canouil.dev/quarto-iconify/highlight-latex.pdf)
-- [Typst/PDF](https://m.canouil.dev/quarto-iconify/highlight-typst.pdf)
-- [Docx](https://m.canouil.dev/quarto-iconify/highlight-openxml.docx)
+- [HTML](https://m.canouil.dev/quarto-highlight-text/)
+- [LaTeX/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-latex.pdf)
+- [Typst/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-typst.pdf)
+- [Docx](https://m.canouil.dev/quarto-highlight-text/highlight-openxml.docx)
