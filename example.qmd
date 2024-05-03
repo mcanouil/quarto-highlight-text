@@ -2,41 +2,56 @@
 title: "Highlight-text Quarto Extension"
 format:
   html:
-    output-file: highlight-html
+    output-file: index
   typst:
     output-file: highlight-typst
   pdf:
     output-file: highlight-latex
   docx:
     output-file: highlight-openxml
+format-links: true
 filters:
   - highlight-text
 ---
 
-::: {.content-visible when-format="pdf"}
-## LaTeX / PDF
+This is a Quarto extension that allows to highlight text in a document for various format: HTML, LaTeX, Typst, and Docx.
+
+## Installing
+
+```bash
+quarto add mcanouil/highlight-text
+```
+
+This will install the extension under the `_extensions` subdirectory.
+If you're using version control, you will want to check in this directory.
+
+## Using
+
+To use the extension, add the following to your document's front matter:
+
+```yaml
+filters:
+  - highlight-text
+```
+
+Then you can use the span syntax markup to highlight text in your document.
+
+::: {layout-ncol="2"}
+
+:::: {#uk}
+```markdown
+[Red]{colour="#b22222"}
+```
 
 [Red]{colour="#b22222"}
+::::
+
+:::: {#us}
+```markdown
 [Blue]{color="#0000FF"}
-:::
+```
 
-::: {.content-visible when-format="html"}
-## HTML
-
-[Red]{colour="#b22222"}
 [Blue]{color="#0000FF"}
-:::
+::::
 
-::: {.content-visible when-format="typst"}
-## Typst
-
-[Red]{colour="#b22222"}
-[Blue]{color="#0000FF"}
-:::
-
-::: {.content-visible when-format="docx"}
-## Docx
-
-[Red]{colour="#b22222"}
-[Blue]{color="#0000FF"}
 :::

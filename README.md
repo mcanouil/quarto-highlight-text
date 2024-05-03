@@ -20,11 +20,11 @@ filters:
   - highlight-text
 ```
 
-Then you can use the span syntax markup to highlight text in your document.
+Then you can use the span syntax markup to highlight text in your document, *e.g.*:
 
 ```markdown
-[Red]{colour="#b22222"}
-[Blue]{color="#0000FF"}
+[Red]{colour="#b22222"} # UK
+[Blue]{color="#0000FF"}  # US
 ```
 
 ## Example
@@ -33,7 +33,7 @@ Here is the source code for a minimal example: [example.qmd](example.qmd).
 
 This is the output of `example.qmd` for:
 
-- [HTML](https://m.canouil.dev/quarto-iconify/).
-- [LaTeX/PDF](https://m.canouil.dev/quarto-iconify/highlight-latex.pdf).
-- [Typst/PDF](https://m.canouil.dev/quarto-iconify/highlight-typst.pdf).
-- [Docx](https://m.canouil.dev/quarto-iconify/highlight-openxml.docx).
+- [HTML](https://m.canouil.dev/quarto-iconify/)
+- [LaTeX/PDF](https://m.canouil.dev/quarto-iconify/highlight-latex.pdf)
+- [Typst/PDF](https://m.canouil.dev/quarto-iconify/highlight-typst.pdf)
+- [Docx](https://m.canouil.dev/quarto-iconify/highlight-openxml.docx)
