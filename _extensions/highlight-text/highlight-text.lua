@@ -22,65 +22,121 @@
 # SOFTWARE.
 ]]
 
-local function highlight_html(span, colour)
-  span.attributes['colour'] = nil
-  span.attributes['color'] = nil
-  span.attributes['style'] = 'color: ' .. colour .. ';'
+local function highlight_html(span, colour, bg_colour)
+  if span.attributes['style'] == nil then
+    span.attributes['style'] = ''
+  elseif span.attributes['style']:sub(-1) ~= ";" then
+    span.attributes['style'] = span.attributes['style'] .. ";"
+  end
+
+  if colour ~= nil then
+    span.attributes['colour'] = nil
+    span.attributes['color'] = nil
+    span.attributes['style'] = span.attributes['style'] .. 'color: ' .. colour .. ';'
+  end
+
+  if bg_colour ~= nil then
+    span.attributes['bg-colour'] = nil
+    span.attributes['bg-color'] = nil
+    span.attributes['style'] = span.attributes['style'] .. 'background-color: ' .. bg_colour .. ';'
+  end
+
   return span
 end
 
-local function highlight_latex(span, colour)
+local function highlight_latex(span, colour, bg_colour)
+  if colour == nil then
+    colour_open = ''
+    colour_close = ''
+  else
+    colour_open = '\\textcolor[HTML]{' .. colour:gsub("^#", "") .. '}{'
+    colour_close = '}'
+  end
+  if bg_colour == nil then
+    bg_colour_open = ''
+    bg_colour_close = ''
+  else
+    bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{'
+    bg_colour_close = '}'
+  end
+
   table.insert(
     span.content, 1,
-    pandoc.RawInline('latex', '\\textcolor[HTML]{' .. colour:gsub("^#", "") .. '}{')
+    pandoc.RawInline('latex', colour_open .. bg_colour_open)
   )
-  table.insert(
-    span.content,
-    pandoc.RawInline('latex', '}')
-  )
+  table.insert(span.content, pandoc.RawInline('latex', bg_colour_close .. colour_close))
+
   return span.content
 end
 
-local function highlight_openxml(span, colour)
-  table.insert(
-    span.content, 1,
-    pandoc.RawInline('openxml', '<w:r><w:rPr><w:color w:val="' .. colour:gsub("^#", "") .. '"/></w:rPr><w:t>')
-  )
-  table.insert(
-    span.content,
-    pandoc.RawInline('openxml', '</w:t></w:r>')
-  )
+local function highlight_openxml(span, colour, bg_colour)
+  local spec = '<w:r><w:rPr>'
+  if bg_colour ~= nil then
+    spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub("^#", "") .. '"/>'
+  end
+  if colour ~= nil then
+    spec = spec .. '<w:color w:val="' .. colour:gsub("^#", "") .. '"/>'
+  end
+  spec = spec .. '</w:rPr><w:t>'
+
+  table.insert(span.content, 1, pandoc.RawInline('openxml', spec))
+  table.insert(span.content, pandoc.RawInline('openxml', '</w:t></w:r>'))
+
   return span.content
 end
 
-local function highlight_typst(span, colour)
+local function highlight_typst(span, colour, bg_colour)
+  if colour == nil then
+    colour_open = ''
+    colour_close = ''
+  else
+    colour_open = '#text(rgb("' .. colour .. '"))['
+    colour_close = ']'
+  end
+
+  if bg_colour == nil then
+    bg_colour_open = ''
+    bg_colour_close = ''
+  else
+    bg_colour_open = '#highlight(fill: rgb("' .. bg_colour .. '"))['
+    bg_colour_close = ']'
+  end
+
   table.insert(
     span.content, 1,
-    pandoc.RawInline('typst', '#text(rgb("' .. colour .. '"))[')
+    pandoc.RawInline('typst', colour_open .. bg_colour_open)
   )
   table.insert(
     span.content,
-    pandoc.RawInline('typst', ']')
+    pandoc.RawInline('typst', bg_colour_close .. colour_close)
   )
+
   return span.content
 end
 
 function Span(span)
-  colour = span.attributes['colour']
+  local colour = span.attributes['colour']
   if colour == nil then
     colour = span.attributes['color']
   end
 
-  if colour == nil then return span end
+  local bg_colour = span.attributes['bg-colour']
+  if bg_colour == nil then
+    bg_colour = span.attributes['bg-color']
+  end
+
+  if colour == nil and bg_colour == nil then return span end
 
   if FORMAT:match 'html' or FORMAT:match 'revealjs' then
-    return highlight_html(span, colour)
+    return highlight_html(span, colour, bg_colour)
   elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
-    return highlight_latex(span, colour)
-  elseif FORMAT:match 'docx' or FORMAT:match 'pptx' then
-    return highlight_openxml(span, colour)
+    return highlight_latex(span, colour, bg_colour)
+  elseif FORMAT:match 'docx' then
+    return highlight_openxml(span, colour, bg_colour)
+  elseif FORMAT:match 'pptx' then
+    return span -- Not implemented/supported
   elseif FORMAT:match 'typst' then
-    return highlight_typst(span, colour)
+    return highlight_typst(span, colour, bg_colour)
   else
     return span
   end
