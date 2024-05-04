@@ -36,6 +36,7 @@ jobs:
         shell: bash
         run: |
           echo -e "project:\n  output-dir: _site" > _quarto.yml
+          # Render to all formats via for loop to avoid LaTeX error "pdf/beamer" formats
           for format in html typst pdf docx revealjs beamer pptx; do
             quarto render --to ${format}
           done
