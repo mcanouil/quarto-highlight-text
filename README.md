@@ -23,8 +23,8 @@ filters:
 Then you can use the span syntax markup to highlight text in your document, *e.g.*:
 
 ```markdown
-[Red]{colour="#b22222"} # UK
-[Blue]{color="#0000FF"}  # US
+[Red]{colour="#b22222" bg-colour="#abc123"} # UK
+[Blue]{color="#0000FF" bg-color="#ABC123"} # US
 ```
 
 ## Example
