@@ -36,7 +36,9 @@ jobs:
         shell: bash
         run: |
           echo -e "project:\n  output-dir: _site" > _quarto.yml
-          quarto render example.qmd
+          for format in html typst pdf docx revealjs beamer pptx; do
+            quarto render --to ${format}
+          done
       
       - uses: actions/configure-pages@v5
 

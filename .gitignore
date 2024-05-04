@@ -1,6 +1,8 @@
+/.luarc.json
+/.quarto/
+_quarto.yml
 *.html
 *.pdf
+*.docx
+*.pptx
 *_files/
-/.luarc.json
-
-/.quarto/
