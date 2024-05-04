@@ -48,6 +48,8 @@ Then you can use the span syntax markup to highlight text in your document.
 ::: {.content-hidden when-format="pptx"}
 :::: {layout-ncol="2"}
 ::::: {#UK}
+### United Kingdom Spellings
+
 ```markdown
 [Red text]{colour="#b22222"}
 ```
@@ -70,6 +72,8 @@ Then you can use the span syntax markup to highlight text in your document.
 :::::
 
 ::::: {#US}
+### United States Spellings
+
 ```markdown
 [Blue text]{color="#0000FF"}
 ```
@@ -96,6 +100,8 @@ Then you can use the span syntax markup to highlight text in your document.
 ::: {.content-visible when-format="pptx"}
 :::: {.columns}
 ::::: {.column width="50%"}
+### United Kingdom Spellings
+
 ```markdown
 [Red text]{colour="#b22222"}
 ```
@@ -118,6 +124,8 @@ Then you can use the span syntax markup to highlight text in your document.
 :::::
 
 ::::: {.column width="50%"}
+### United States Spellings
+
 ```markdown
 [Blue text]{color="#0000FF"}
 ```
