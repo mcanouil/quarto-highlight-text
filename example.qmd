@@ -34,7 +34,7 @@ quarto add mcanouil/highlight-text
 This will install the extension under the `_extensions` subdirectory.
 If you're using version control, you will want to check in this directory.
 
-## Using
+## Using {.smaller}
 
 To use the extension, add the following to your document's front matter:
 
@@ -45,23 +45,50 @@ filters:
 
 Then you can use the span syntax markup to highlight text in your document.
 
-
 ::: {.content-hidden when-format="pptx"}
 :::: {layout-ncol="2"}
 ::::: {#UK}
 ```markdown
-[Red]{colour="#b22222"}
+[Red text]{colour="#b22222"}
 ```
 
-[Red]{colour="#b22222"}
+[Red text]{colour="#b22222"}
+
+```markdown
+[Red background]{bg-colour="#b22222"}
+```
+
+[Red background]{bg-colour="#b22222"}
+
+```markdown
+[White text, Red background]{
+  colour="#FFFFFF" bg-colour="#b22222"
+}
+```
+
+[White text, Red background]{colour="#FFFFFF" bg-colour="#b22222"}
 :::::
 
 ::::: {#US}
 ```markdown
-[Blue]{color="#0000FF"}
+[Blue text]{color="#0000FF"}
 ```
 
-[Blue]{color="#0000FF"}
+[Blue text]{color="#0000FF"}
+
+```markdown
+[Blue background]{bg-color="#0000FF"}
+```
+
+[Blue background]{bg-color="#0000FF"}
+
+```markdown
+[White text, Blue background]{
+  color="#FFFFFF" bg-color="#0000FF"
+}
+```
+
+[White text, Blue background]{color="#FFFFFF" bg-color="#0000FF"}
 :::::
 ::::
 :::
@@ -70,18 +97,46 @@ Then you can use the span syntax markup to highlight text in your document.
 :::: {.columns}
 ::::: {.column width="50%"}
 ```markdown
-[Red]{colour="#b22222"}
+[Red text]{colour="#b22222"}
 ```
 
-[Red]{colour="#b22222"}
+[Red text]{colour="#b22222"}
+
+```markdown
+[Red background]{bg-colour="#b22222"}
+```
+
+[Red background]{bg-colour="#b22222"}
+
+```markdown
+[White text, Red background]{
+  colour="#FFFFFF" bg-colour="#b22222"
+}
+```
+
+[White text, Red background]{colour="#FFFFFF" bg-colour="#b22222"}
 :::::
 
 ::::: {.column width="50%"}
 ```markdown
-[Blue]{color="#0000FF"}
+[Blue text]{color="#0000FF"}
 ```
 
-[Blue]{color="#0000FF"}
+[Blue text]{color="#0000FF"}
+
+```markdown
+[Blue background]{bg-color="#0000FF"}
+```
+
+[Blue background]{bg-color="#0000FF"}
+
+```markdown
+[White text, Blue background]{
+  color="#FFFFFF" bg-color="#0000FF"
+}
+```
+
+[White text, Blue background]{color="#FFFFFF" bg-color="#0000FF"}
 :::::
 ::::
 :::
