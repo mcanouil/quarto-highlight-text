@@ -8,8 +8,17 @@ format:
   pdf:
     output-file: highlight-latex
   docx:
-    output-file: highlight-openxml
+    output-file: highlight-docx
+  revealjs:
+    output-file: highlight-revealjs
+  beamer:
+    output-file: highlight-beamer
+  pptx:
+    output-file: highlight-pptx
 format-links: true
+embed-resources: true
+execute:
+  echo: true
 filters:
   - highlight-text
 ---
@@ -36,22 +45,43 @@ filters:
 
 Then you can use the span syntax markup to highlight text in your document.
 
-::: {layout-ncol="2"}
 
-:::: {#uk}
+::: {.content-hidden when-format="pptx"}
+:::: {layout-ncol="2"}
+::::: {#UK}
 ```markdown
 [Red]{colour="#b22222"}
 ```
 
 [Red]{colour="#b22222"}
-::::
+:::::
 
-:::: {#us}
+::::: {#US}
 ```markdown
 [Blue]{color="#0000FF"}
 ```
 
 [Blue]{color="#0000FF"}
+:::::
 ::::
+:::
 
+::: {.content-visible when-format="pptx"}
+:::: {.columns}
+::::: {.column width="50%"}
+```markdown
+[Red]{colour="#b22222"}
+```
+
+[Red]{colour="#b22222"}
+:::::
+
+::::: {.column width="50%"}
+```markdown
+[Blue]{color="#0000FF"}
+```
+
+[Blue]{color="#0000FF"}
+:::::
+::::
 :::

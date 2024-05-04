@@ -34,6 +34,9 @@ Here is the source code for a minimal example: [example.qmd](example.qmd).
 This is the output of `example.qmd` for:
 
 - [HTML](https://m.canouil.dev/quarto-highlight-text/)
-- [LaTeX/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-latex.pdf)
 - [Typst/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-typst.pdf)
-- [Docx](https://m.canouil.dev/quarto-highlight-text/highlight-openxml.docx)
+- [LaTeX/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-latex.pdf)
+- [Word/Docx](https://m.canouil.dev/quarto-highlight-text/highlight-openxml.docx)
+- [Reveal.js](https://m.canouil.dev/quarto-highlight-text/highlight-revealjs.html)
+- [Beamer/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-beamer.pdf)
+- [PowerPoint/Pptx](https://m.canouil.dev/quarto-highlight-text/highlight-pptx.pptx) (*not supported yet*)
