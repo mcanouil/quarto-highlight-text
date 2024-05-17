@@ -94,6 +94,9 @@ Then you can use the span syntax markup to highlight text in your document.
 :::
 
 ::: {.content-visible when-format="pptx"}
+
+## Font colour
+
 :::: {.columns}
 ::::: {.column width="50%"}
 ```markdown
@@ -101,13 +104,41 @@ Then you can use the span syntax markup to highlight text in your document.
 ```
 
 [Red text]{colour="#b22222"}
+:::::
 
+::::: {.column width="50%"}
+```markdown
+[Blue text]{color="#0000FF"}
+```
+
+[Blue text]{color="#0000FF"}
+:::::
+::::
+
+## Background colour
+
+:::: {.columns}
+::::: {.column width="50%"}
 ```markdown
 [Red background]{bg-colour="#b22222"}
 ```
 
 [Red background]{bg-colour="#b22222"}
+:::::
 
+::::: {.column width="50%"}
+```markdown
+[Blue background]{bg-color="#0000FF"}
+```
+
+[Blue background]{bg-color="#0000FF"}
+:::::
+::::
+
+## Font and Background colour
+
+:::: {.columns}
+::::: {.column width="50%"}
 ```markdown
 [White text, Red background]{
   colour="#FFFFFF" bg-colour="#b22222"
@@ -118,18 +149,6 @@ Then you can use the span syntax markup to highlight text in your document.
 :::::
 
 ::::: {.column width="50%"}
-```markdown
-[Blue text]{color="#0000FF"}
-```
-
-[Blue text]{color="#0000FF"}
-
-```markdown
-[Blue background]{bg-color="#0000FF"}
-```
-
-[Blue background]{bg-color="#0000FF"}
-
 ```markdown
 [White text, Blue background]{
   color="#FFFFFF" bg-color="#0000FF"
