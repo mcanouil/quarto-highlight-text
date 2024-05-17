@@ -39,4 +39,4 @@ This is the output of `example.qmd` for:
 - [Word/Docx](https://m.canouil.dev/quarto-highlight-text/highlight-openxml.docx)
 - [Reveal.js](https://m.canouil.dev/quarto-highlight-text/highlight-revealjs.html)
 - [Beamer/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-beamer.pdf)
-- [PowerPoint/Pptx](https://m.canouil.dev/quarto-highlight-text/highlight-pptx.pptx) (*not supported yet*)
+- [PowerPoint/Pptx](https://m.canouil.dev/quarto-highlight-text/highlight-pptx.pptx) (*only supports plain text*)
