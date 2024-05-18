@@ -43,7 +43,7 @@ quarto add mcanouil/quarto-highlight-text
 This will install the extension under the `_extensions` subdirectory.
 If you're using version control, you will want to check in this directory.
 
-## Using {.smaller}
+## Using
 
 To use the extension, add the following to your document's front matter:
 
@@ -55,8 +55,8 @@ filters:
 Then you can use the span syntax markup to highlight text in your document.
 
 ```markdown
-[Text]{colour="#FFFFFF" bg-colour="#b22222"}
-[Text]{color="#FFFFFF" bg-color="#b22222"}
+[Red]{colour="#b22222" bg-colour="#abc123"} # UK
+[Blue]{color="#0000FF" bg-color="#ABC123"} # US
 ```
 
 ## Font Colour
@@ -87,7 +87,7 @@ Then you can use the span syntax markup to highlight text in your document.
 
 [Blue background]{bg-color="#0000FF"}
 
-## Font and Background Colour {.smaller}
+## Font and Background Colour
 
 ```markdown
 [White text, Red background]{
@@ -105,7 +105,7 @@ Then you can use the span syntax markup to highlight text in your document.
 
 [White text, Blue background]{color="#FFFFFF" bg-color="#0000FF"}
 
-## More Examples {.smaller}
+## More Examples
 
 ```markdown
 [text [with a link](https://quarto.org/)]{

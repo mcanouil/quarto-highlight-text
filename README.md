@@ -27,11 +27,11 @@ Then you can use the span syntax markup to highlight text in your document, *e.g
 [Blue]{color="#0000FF" bg-color="#ABC123"} # US
 ```
 
-## Example
+## Examples
 
-Here is the source code for a minimal example: [example.qmd](example.qmd).
+Here is the source code for a minimal example: [`example.qmd`](example.qmd).
 
-This is the output of `example.qmd` for:
+Outputs of `example.qmd`:
 
 - [HTML](https://m.canouil.dev/quarto-highlight-text/)
 - [Typst/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-typst.pdf)
