@@ -69,7 +69,7 @@ local function highlight_latex(span, colour, bg_colour)
   return span.content
 end
 
-local function highlight_openxml(span, colour, bg_colour)
+local function highlight_openxml_docx(span, colour, bg_colour)
   local spec = '<w:r><w:rPr>'
   if bg_colour ~= nil then
     spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub("^#", "") .. '"/>'
@@ -83,6 +83,27 @@ local function highlight_openxml(span, colour, bg_colour)
   table.insert(span.content, pandoc.RawInline('openxml', '</w:t></w:r>'))
 
   return span.content
+end
+
+local function highlight_openxml_pptx(span, colour, bg_colour)
+  local spec = '<a:r><a:rPr dirty="0">'
+  if bg_colour ~= nil then
+    spec = spec .. '<a:highlight><a:srgbClr val="' .. bg_colour:gsub("^#", "") .. '" /></a:highlight>'
+  end
+  if colour ~= nil then
+    spec = spec .. '<a:solidFill><a:srgbClr val="' .. colour:gsub("^#", "") .. '" /></a:solidFill>'
+  end
+  spec = spec .. '</a:rPr><a:t>'
+
+  -- table.insert(span.content, 1, pandoc.RawInline('openxml', spec))
+  -- table.insert(span.content, pandoc.RawInline('openxml', '</a:t></a:r>'))
+
+  local span_content_string = ""
+  for i, inline in ipairs(span.content) do
+    span_content_string = span_content_string .. pandoc.utils.stringify(inline)
+  end
+
+  return pandoc.RawInline('openxml', spec .. span_content_string .. '</a:t></a:r>')
 end
 
 local function highlight_typst(span, colour, bg_colour)
@@ -132,9 +153,9 @@ function Span(span)
   elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
     return highlight_latex(span, colour, bg_colour)
   elseif FORMAT:match 'docx' then
-    return highlight_openxml(span, colour, bg_colour)
+    return highlight_openxml_docx(span, colour, bg_colour)
   elseif FORMAT:match 'pptx' then
-    return span -- Not implemented/supported
+    return highlight_openxml_pptx(span, colour, bg_colour)
   elseif FORMAT:match 'typst' then
     return highlight_typst(span, colour, bg_colour)
   else

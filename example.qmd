@@ -5,14 +5,23 @@ format:
     output-file: index
   typst:
     output-file: highlight-typst
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
   pdf:
     output-file: highlight-latex
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
   docx:
     output-file: highlight-docx
   revealjs:
     output-file: highlight-revealjs
   beamer:
     output-file: highlight-beamer
+    aspectratio: 169
   pptx:
     output-file: highlight-pptx
 format-links: true
@@ -45,9 +54,13 @@ filters:
 
 Then you can use the span syntax markup to highlight text in your document.
 
-::: {.content-hidden when-format="pptx"}
-:::: {layout-ncol="2"}
-::::: {#UK}
+```markdown
+[Text]{colour="#FFFFFF" bg-colour="#b22222"}
+[Text]{color="#FFFFFF" bg-color="#b22222"}
+```
+
+## Font Colour
+
 ```markdown
 [Red text]{colour="#b22222"}
 ```
@@ -55,10 +68,26 @@ Then you can use the span syntax markup to highlight text in your document.
 [Red text]{colour="#b22222"}
 
 ```markdown
+[Blue text]{color="#0000FF"}
+```
+
+[Blue text]{color="#0000FF"}
+
+## Background Colour
+
+```markdown
 [Red background]{bg-colour="#b22222"}
 ```
 
 [Red background]{bg-colour="#b22222"}
+
+```markdown
+[Blue background]{bg-color="#0000FF"}
+```
+
+[Blue background]{bg-color="#0000FF"}
+
+## Font and Background Colour {.smaller}
 
 ```markdown
 [White text, Red background]{
@@ -67,20 +96,6 @@ Then you can use the span syntax markup to highlight text in your document.
 ```
 
 [White text, Red background]{colour="#FFFFFF" bg-colour="#b22222"}
-:::::
-
-::::: {#US}
-```markdown
-[Blue text]{color="#0000FF"}
-```
-
-[Blue text]{color="#0000FF"}
-
-```markdown
-[Blue background]{bg-color="#0000FF"}
-```
-
-[Blue background]{bg-color="#0000FF"}
 
 ```markdown
 [White text, Blue background]{
@@ -89,54 +104,15 @@ Then you can use the span syntax markup to highlight text in your document.
 ```
 
 [White text, Blue background]{color="#FFFFFF" bg-color="#0000FF"}
-:::::
-::::
-:::
 
-::: {.content-visible when-format="pptx"}
-:::: {.columns}
-::::: {.column width="50%"}
-```markdown
-[Red text]{colour="#b22222"}
-```
-
-[Red text]{colour="#b22222"}
+## More Examples {.smaller}
 
 ```markdown
-[Red background]{bg-colour="#b22222"}
-```
-
-[Red background]{bg-colour="#b22222"}
-
-```markdown
-[White text, Red background]{
-  colour="#FFFFFF" bg-colour="#b22222"
+[text [with a link](https://quarto.org/)]{
+  color="#FFFFFF" bg-color="#00FFFF"
 }
 ```
 
-[White text, Red background]{colour="#FFFFFF" bg-colour="#b22222"}
-:::::
-
-::::: {.column width="50%"}
-```markdown
-[Blue text]{color="#0000FF"}
-```
-
-[Blue text]{color="#0000FF"}
-
-```markdown
-[Blue background]{bg-color="#0000FF"}
-```
-
-[Blue background]{bg-color="#0000FF"}
-
-```markdown
-[White text, Blue background]{
-  color="#FFFFFF" bg-color="#0000FF"
+[text [with a link](https://quarto.org/)]{
+  color="#FFFFFF" bg-color="#00FFFF"
 }
-```
-
-[White text, Blue background]{color="#FFFFFF" bg-color="#0000FF"}
-:::::
-::::
-:::
