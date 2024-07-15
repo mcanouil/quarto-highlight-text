@@ -38,7 +38,7 @@ local function highlight_html(span, colour, bg_colour)
   if bg_colour ~= nil then
     span.attributes['bg-colour'] = nil
     span.attributes['bg-color'] = nil
-    span.attributes['style'] = span.attributes['style'] .. 'background-color: ' .. bg_colour .. ';'
+    span.attributes['style'] = span.attributes['style'] .. 'border-radius: 0.2rem; padding: 0 0.2rem 0 0.2rem;' .. 'background-color: ' .. bg_colour .. ';'
   end
 
   return span
