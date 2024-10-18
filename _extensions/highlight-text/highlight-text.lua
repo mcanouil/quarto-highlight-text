@@ -87,11 +87,11 @@ end
 
 local function highlight_openxml_pptx(span, colour, bg_colour)
   local spec = '<a:r><a:rPr dirty="0">'
-  if bg_colour ~= nil then
-    spec = spec .. '<a:highlight><a:srgbClr val="' .. bg_colour:gsub("^#", "") .. '" /></a:highlight>'
-  end
   if colour ~= nil then
     spec = spec .. '<a:solidFill><a:srgbClr val="' .. colour:gsub("^#", "") .. '" /></a:solidFill>'
+  end
+  if bg_colour ~= nil then
+    spec = spec .. '<a:highlight><a:srgbClr val="' .. bg_colour:gsub("^#", "") .. '" /></a:highlight>'
   end
   spec = spec .. '</a:rPr><a:t>'
 
