@@ -116,15 +116,3 @@ Then you can use the span syntax markup to highlight text in your document.
 [text [with a link](https://quarto.org/)]{
   color="#FFFFFF" bg-color="#00FFFF"
 }
-
-## Line Breaks in Highlighted Text
-
-```markdown
-[{{< lipsum 1 >}}]{
-  color="#FFFFFF" bg-color="#FF5733"
-}
-```
-
-[{{< lipsum 1 >}}]{
-  color="#FFFFFF" bg-color="#FF5733"
-}
