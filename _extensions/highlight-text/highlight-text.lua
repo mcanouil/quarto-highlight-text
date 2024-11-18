@@ -56,7 +56,7 @@ local function highlight_latex(span, colour, bg_colour)
     bg_colour_open = ''
     bg_colour_close = ''
   else
-    bg_colour_open = '\\fcolorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{\\parbox{\\linewidth}{'
+    bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{\\parbox{\\linewidth}{'
     bg_colour_close = '}}'
   end
 
