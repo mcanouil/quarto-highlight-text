@@ -22,6 +22,18 @@
 # SOFTWARE.
 ]]
 
+local function get_brand_color(colour)
+  local brand = require('modules/brand/brand')
+  if colour and colour:match("^brand%-color.") then
+    colour = brand.get_color(colour:gsub("^brand%-color%.", ""))
+  else
+    if FORMAT:match 'typst' and colour  ~= nil then
+      colour = 'rgb("' .. colour .. '")'
+    end
+  end
+  return colour
+end
+
 local function highlight_html(span, colour, bg_colour)
   if span.attributes['style'] == nil then
     span.attributes['style'] = ''
@@ -111,7 +123,7 @@ local function highlight_typst(span, colour, bg_colour)
     colour_open = ''
     colour_close = ''
   else
-    colour_open = '#text(rgb("' .. colour .. '"))['
+    colour_open = '#text(' .. colour .. ')['
     colour_close = ']'
   end
 
@@ -119,7 +131,7 @@ local function highlight_typst(span, colour, bg_colour)
     bg_colour_open = ''
     bg_colour_close = ''
   else
-    bg_colour_open = '#highlight(fill: rgb("' .. bg_colour .. '"))['
+    bg_colour_open = '#highlight(fill: ' .. bg_colour .. ')['
     bg_colour_close = ']'
   end
 
@@ -147,6 +159,9 @@ function Span(span)
   end
 
   if colour == nil and bg_colour == nil then return span end
+
+  colour = get_brand_color(colour)
+  bg_colour = get_brand_color(bg_colour)
 
   if FORMAT:match 'html' or FORMAT:match 'revealjs' then
     return highlight_html(span, colour, bg_colour)
