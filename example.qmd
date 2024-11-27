@@ -62,6 +62,7 @@ Then you can use the span syntax markup to highlight text in your document.
 
 ```markdown
 [Red]{colour="#b22222" bg-colour="#abc123"} # UK
+[Red]{fg="#b22222" bg="#abc123"}
 [Blue]{color="#0000FF" bg-color="#ABC123"} # US
 ```
 
@@ -97,19 +98,19 @@ Then you can use the span syntax markup to highlight text in your document.
 
 ```markdown
 [White text, Red background]{
-  colour="#FFFFFF" bg-colour="#b22222"
+  fg="#FFFFFF" bg="#b22222"
 }
 ```
 
-[White text, Red background]{colour="#FFFFFF" bg-colour="#b22222"}
+[White text, Red background]{fg="#FFFFFF" bg="#b22222"}
 
 ```markdown
 [White text, Blue background]{
-  color="#FFFFFF" bg-color="#0000FF"
+  colour="#FFFFFF" bg-colour="#0000FF"
 }
 ```
 
-[White text, Blue background]{color="#FFFFFF" bg-color="#0000FF"}
+[White text, Blue background]{colour="#FFFFFF" bg-colour="#0000FF"}
 
 ## More Examples
 

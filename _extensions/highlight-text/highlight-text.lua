@@ -152,10 +152,16 @@ function Span(span)
   if colour == nil then
     colour = span.attributes['color']
   end
+  if colour == nil then
+    colour = span.attributes['fg']
+  end
 
   local bg_colour = span.attributes['bg-colour']
   if bg_colour == nil then
     bg_colour = span.attributes['bg-color']
+  end
+  if bg_colour == nil then
+    bg_colour = span.attributes['bg']
   end
 
   if colour == nil and bg_colour == nil then return span end
