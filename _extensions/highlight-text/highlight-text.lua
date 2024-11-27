@@ -148,12 +148,18 @@ local function highlight_typst(span, colour, bg_colour)
 end
 
 function Span(span)
-  local colour = span.attributes['colour']
+  local colour = span.attributes['fg']
+  if colour == nil then
+    colour = span.attributes['colour']
+  end
   if colour == nil then
     colour = span.attributes['color']
   end
 
-  local bg_colour = span.attributes['bg-colour']
+  local bg_colour = span.attributes['bg']
+  if bg_colour == nil then
+    bg_colour = span.attributes['bg-colour']
+  end
   if bg_colour == nil then
     bg_colour = span.attributes['bg-color']
   end
