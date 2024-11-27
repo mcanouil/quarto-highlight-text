@@ -146,6 +146,14 @@ function Span(span)
     bg_colour = span.attributes['bg-color']
   end
 
+  local brand = require('modules/brand/brand')
+  if colour and colour:match("^brand%-color.") then
+    colour = brand.get_color(colour:gsub("^brand%-color%.", ""))
+  end
+  if bg_colour and bg_colour:match("^brand%-color.") then
+    bg_colour = brand.get_color(bg_colour:gsub("^brand%-color%.", ""))
+  end
+
   if colour == nil and bg_colour == nil then return span end
 
   if FORMAT:match 'html' or FORMAT:match 'revealjs' then

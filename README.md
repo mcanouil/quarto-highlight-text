@@ -27,6 +27,20 @@ Then you can use the span syntax markup to highlight text in your document, *e.g
 [Blue]{color="#0000FF" bg-color="#ABC123"} # US
 ```
 
+Using colours from `_brand.yml`:
+
+```markdown
+brand:
+  color:
+    palette:
+      red: "#b22222"
+    primary: "#abc123"
+```
+
+```markdown
+[Red]{colour="brand-color.red" bg-colour="brand-color.primary"}
+```
+
 ## Examples
 
 Here is the source code for a minimal example: [`example.qmd`](example.qmd).
