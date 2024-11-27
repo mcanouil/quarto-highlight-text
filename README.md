@@ -27,7 +27,13 @@ Then you can use the span syntax markup to highlight text in your document, *e.g
 [Blue]{color="#0000FF" bg-color="#ABC123"} # US
 ```
 
-Using colours from `_brand.yml`:
+You can also use the shorter syntax ([v1.1.1](../../releases/tag/1.1.1)):
+
+```markdown
+[Red]{fg="red" bg="primary"}
+```
+
+Using colours from `_brand.yml` ([v1.1.0](../../releases/tag/1.1.0)):
 
 ```markdown
 brand:
