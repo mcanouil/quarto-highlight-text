@@ -48,9 +48,9 @@ color:
 
 ## Limitations
 
-LaTeX `\colorbox` command does not support linebreaks in the text to be highlighted.
-This means that the above example will not work in LaTeX output.  
-In order to get a slightly better result, you can use the following syntax `par=true` to add `\parbox{\linewidth}`:
+LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output.  
+In order to get a slightly better result, you can use the `par=true` attribute to add `\parbox{\linewidth}`:
 
 ```markdown
 [Red]{colour="#b22222" bg-colour="#abc123" par=true}
