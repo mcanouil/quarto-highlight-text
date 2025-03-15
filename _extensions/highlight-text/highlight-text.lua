@@ -56,7 +56,7 @@ local function highlight_html(span, colour, bg_colour)
   return span
 end
 
-local function highlight_latex(span, colour, bg_colour)
+local function highlight_latex(span, colour, bg_colour, par)
   if colour == nil then
     colour_open = ''
     colour_close = ''
@@ -68,13 +68,18 @@ local function highlight_latex(span, colour, bg_colour)
     bg_colour_open = ''
     bg_colour_close = ''
   else
-    bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{\\parbox{\\linewidth}{'
-    bg_colour_close = '}}'
+    bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{'
+    bg_colour_close = '}'
+  end
+
+  if par then
+    bg_colour_open = bg_colour_open .. '\\parbox{\\linewidth}{'
+    bg_colour_close = '}' .. bg_colour_close
   end
 
   table.insert(
     span.content, 1,
-    pandoc.RawInline('latex', "{" .. colour_open .. bg_colour_open .. "}")
+    pandoc.RawInline('latex', colour_open .. bg_colour_open)
   )
   table.insert(span.content, pandoc.RawInline('latex', bg_colour_close .. colour_close))
 
@@ -169,10 +174,17 @@ function Span(span)
   colour = get_brand_color(colour)
   bg_colour = get_brand_color(bg_colour)
 
+  if span.attributes['par'] == nil then
+    par = false
+  else
+    par = true
+    span.attributes['par'] = nil
+  end
+
   if FORMAT:match 'html' or FORMAT:match 'revealjs' then
     return highlight_html(span, colour, bg_colour)
   elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
-    return highlight_latex(span, colour, bg_colour)
+    return highlight_latex(span, colour, bg_colour, par)
   elseif FORMAT:match 'docx' then
     return highlight_openxml_docx(span, colour, bg_colour)
   elseif FORMAT:match 'pptx' then

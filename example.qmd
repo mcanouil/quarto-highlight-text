@@ -141,3 +141,27 @@ Then you can use the span syntax markup to highlight text in your document.
 ```
 
 [White text, Blue background]{color="brand-color.primary" bg-color="brand-color.blue"}
+
+## Limitations
+
+LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output.
+
+```markdown
+[Your long text]{colour="#b22222" bg-colour="#abc123"}
+```
+[
+  LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output.
+]{colour="#b22222" bg-colour="#abc123"}
+
+In order to get a slightly better result, you can use the `par=true` attribute to add `\parbox{\linewidth}`:
+
+```markdown
+[Your long text]{colour="#b22222" bg-colour="#abc123" par=true}
+```
+
+[
+  LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output.
+]{colour="#b22222" bg-colour="#abc123" par=true}

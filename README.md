@@ -36,15 +36,24 @@ You can also use the shorter syntax ([v1.1.1](../../releases/tag/1.1.1)):
 Using colours from `_brand.yml` ([v1.1.0](../../releases/tag/1.1.0)):
 
 ```markdown
-brand:
-  color:
-    palette:
-      red: "#b22222"
-    primary: "#abc123"
+color:
+  palette:
+    red: "#b22222"
+  primary: "#abc123"
 ```
 
 ```markdown
 [Red]{colour="brand-color.red" bg-colour="brand-color.primary"}
+```
+
+## Limitations
+
+LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output.  
+In order to get a slightly better result, you can use the `par=true` attribute to add `\parbox{\linewidth}`:
+
+```markdown
+[Red]{colour="#b22222" bg-colour="#abc123" par=true}
 ```
 
 ## Examples
