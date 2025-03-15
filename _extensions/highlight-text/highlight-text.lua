@@ -79,7 +79,7 @@ local function highlight_latex(span, colour, bg_colour, par)
 
   table.insert(
     span.content, 1,
-    pandoc.RawInline('latex', "{" .. colour_open .. bg_colour_open)
+    pandoc.RawInline('latex', colour_open .. bg_colour_open)
   )
   table.insert(span.content, pandoc.RawInline('latex', bg_colour_close .. colour_close))
 
