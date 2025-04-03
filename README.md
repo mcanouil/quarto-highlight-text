@@ -35,7 +35,7 @@ You can also use the shorter syntax ([v1.1.1](../../releases/tag/1.1.1)):
 
 Using colours from `_brand.yml` ([v1.1.0](../../releases/tag/1.1.0)):
 
-```markdown
+```yaml
 color:
   palette:
     red: "#b22222"
@@ -44,6 +44,30 @@ color:
 
 ```markdown
 [Red]{colour="brand-color.red" bg-colour="brand-color.primary"}
+```
+
+Using colours from dark/light themes with Quarto CLI >=1.7.20 ([v1.2.0](../../releases/tag/1.2.0)):
+
+- From `_quarto.yml`, `_metadata.yml`, or document front matter:
+
+  ```yaml
+  brand:
+    dark:
+      color:
+        palette:
+          red: "#b22222"
+        primary: "#abc123"
+  ```
+
+- From a `_brand.yml` file
+
+  ```yaml
+  brand:
+    dark: _brand.yml
+  ```
+
+```markdown
+[Red]{colour="brand-color.red" bg-colour="brand-color.primary" brand="dark"}
 ```
 
 ## Limitations

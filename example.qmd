@@ -31,11 +31,18 @@ execute:
 filters:
   - highlight-text
 brand:
-  color:
-    palette:
-      blue: "#0000ff"
-      red: "#b22222"
-    primary: "#ffffff"
+  light:
+    color:
+      palette:
+        blue: "#0000ff"
+        red: "#b22222"
+      primary: "#ffffff"
+  dark:
+    color:
+      palette:
+        yellow: "#ffff00"
+        green: "#00ff00"
+      primary: "#000000"
 ---
 
 This is a Quarto extension that allows to highlight text in a document for various format: HTML, LaTeX, Typst, and Docx.
@@ -141,6 +148,24 @@ Then you can use the span syntax markup to highlight text in your document.
 ```
 
 [White text, Blue background]{color="brand-color.primary" bg-color="brand-color.blue"}
+
+## `_brand.yml` light and dark mode
+
+```markdown
+[White text, Red background]{
+  colour="brand-color.primary" bg-colour="brand-color.red" brand="light"
+}
+```
+
+[White text, Red background]{colour="brand-color.primary" bg-colour="brand-color.red" brand="light"}
+
+```markdown
+[White text, Blue background]{
+  color="brand-color.primary" bg-color="brand-color.green" brand="dark"
+}
+```
+
+[White text, Blue background]{color="brand-color.primary" bg-color="brand-color.green" brand="dark"}
 
 ## Limitations
 
