@@ -22,7 +22,11 @@
 # SOFTWARE.
 ]]
 
-local function get_brand_color(theme, colour)
+--- Gets a colour value from brand theme or formats it for later use
+--- @param theme string The brand theme to use (light/dark)
+--- @param colour string The colour value or brand colour reference
+--- @return string The processed colour value
+local function get_brand_colour(theme, colour)
   local brand = require('modules/brand/brand')
   if colour and colour:match("^brand%-color.") then
     colour = brand.get_color(theme, colour:gsub("^brand%-color%.", ""))
@@ -34,6 +38,11 @@ local function get_brand_color(theme, colour)
   return colour
 end
 
+--- Applies text and background colour styling for HTML-based outputs
+--- @param span table The span element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table The modified span with HTML styling
 local function highlight_html(span, colour, bg_colour)
   if span.attributes['style'] == nil then
     span.attributes['style'] = ''
@@ -56,6 +65,12 @@ local function highlight_html(span, colour, bg_colour)
   return span
 end
 
+--- Applies text and background colour styling for LaTeX-based outputs
+--- @param span table The span element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @param par boolean Whether to wrap in a paragraph box
+--- @return table The span content with LaTeX markup
 local function highlight_latex(span, colour, bg_colour, par)
   if colour == nil then
     colour_open = ''
@@ -86,6 +101,11 @@ local function highlight_latex(span, colour, bg_colour, par)
   return span.content
 end
 
+--- Applies text and background colour styling for Word documents
+--- @param span table The span element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table The span content with OpenXML markup for Word
 local function highlight_openxml_docx(span, colour, bg_colour)
   local spec = '<w:r><w:rPr>'
   if bg_colour ~= nil then
@@ -102,6 +122,11 @@ local function highlight_openxml_docx(span, colour, bg_colour)
   return span.content
 end
 
+--- Applies text and background colour styling for PowerPoint presentations
+--- @param span table The span element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table Raw inline containing OpenXML markup for PowerPoint
 local function highlight_openxml_pptx(span, colour, bg_colour)
   local spec = '<a:r><a:rPr dirty="0">'
   if colour ~= nil then
@@ -123,6 +148,11 @@ local function highlight_openxml_pptx(span, colour, bg_colour)
   return pandoc.RawInline('openxml', spec .. span_content_string .. '</a:t></a:r>')
 end
 
+--- Applies text and background colour styling for Typst output
+--- @param span table The span element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table The span content with Typst markup
 local function highlight_typst(span, colour, bg_colour)
   if colour == nil then
     colour_open = ''
@@ -152,7 +182,11 @@ local function highlight_typst(span, colour, bg_colour)
   return span.content
 end
 
-function Span(span)
+--- Main filter function that processes span elements and applies highlighting
+--- based on the output format and specified attributes
+--- @param span table The span element from the document
+--- @return table The modified span or span content with appropriate styling
+local function highlight(span)
   local colour = span.attributes['fg']
   if colour == nil then
     colour = span.attributes['colour']
@@ -176,8 +210,8 @@ function Span(span)
 
   if colour == nil and bg_colour == nil then return span end
 
-  colour = get_brand_color(brand, colour)
-  bg_colour = get_brand_color(brand, bg_colour)
+  colour = get_brand_colour(brand, colour)
+  bg_colour = get_brand_colour(brand, bg_colour)
 
   if span.attributes['par'] == nil then
     par = false
@@ -200,3 +234,7 @@ function Span(span)
     return span
   end
 end
+
+return {
+  { Span = highlight },
+}
