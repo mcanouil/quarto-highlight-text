@@ -22,10 +22,10 @@
 # SOFTWARE.
 ]]
 
-local function get_brand_color(colour)
+local function get_brand_color(theme, colour)
   local brand = require('modules/brand/brand')
   if colour and colour:match("^brand%-color.") then
-    colour = brand.get_color(colour:gsub("^brand%-color%.", ""))
+    colour = brand.get_color(theme, colour:gsub("^brand%-color%.", ""))
   else
     if FORMAT:match 'typst' and colour  ~= nil then
       colour = 'rgb("' .. colour .. '")'
@@ -169,10 +169,15 @@ function Span(span)
     bg_colour = span.attributes['bg-color']
   end
 
+  local brand = span.attributes['brand']
+  if brand == nil then
+    brand = "light"
+  end
+
   if colour == nil and bg_colour == nil then return span end
 
-  colour = get_brand_color(colour)
-  bg_colour = get_brand_color(bg_colour)
+  colour = get_brand_color(brand, colour)
+  bg_colour = get_brand_color(brand, bg_colour)
 
   if span.attributes['par'] == nil then
     par = false
