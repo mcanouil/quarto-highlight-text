@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: "Highlight-text Extension For Quarto"
+message: "If you use this project, please cite it as below."
+type: software
+authors:
+  - family-names: "Canouil"
+    given-names: "Mickaël"
+    orcid: "https://orcid.org/0000-0002-3396-4549"
+repository-code: "https://github.com/mcanouil/quarto-highlight-text"
+url: "http://m.canouil.dev/quarto-highlight-text/"
+license: "MIT"
+date-released: "2025-03-15"
+version: 1.1.3
