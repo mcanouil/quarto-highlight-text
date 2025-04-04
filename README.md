@@ -48,7 +48,7 @@ color:
 
 Using colours from dark/light themes with Quarto CLI >=1.7.20 ([v1.2.0](../../releases/tag/1.2.0)):
 
-- From `_quarto.yml`, `_metadata.yml`, or document front matter:
+- From document front matter:
 
   ```yaml
   brand:
@@ -59,7 +59,7 @@ Using colours from dark/light themes with Quarto CLI >=1.7.20 ([v1.2.0](../../re
         primary: "#abc123"
   ```
 
-- From a `_brand.yml` file
+- From `_quarto.yml` and `_brand.yml` file
 
   ```yaml
   brand:
