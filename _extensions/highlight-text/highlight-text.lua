@@ -84,7 +84,6 @@ local function highlight_html(span, settings)
     table.insert(result, theme_span)
   end
 
-  -- Return a single span or a list of spans
   if #result == 1 then
     return result[1]
   else
