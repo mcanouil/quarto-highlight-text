@@ -40,29 +40,56 @@ end
 
 --- Applies text and background colour styling for HTML-based outputs
 --- @param span table The span element to modify
---- @param colour string The text colour to apply
---- @param bg_colour string The background colour to apply
+--- @param settings table The highlight settings containing colour and background colour
 --- @return table The modified span with HTML styling
-local function highlight_html(span, colour, bg_colour)
-  if span.attributes['style'] == nil then
-    span.attributes['style'] = ''
-  elseif span.attributes['style']:sub(-1) ~= ";" then
-    span.attributes['style'] = span.attributes['style'] .. ";"
+local function highlight_html(span, settings)
+  local result = {}
+  local theme_keys = {}
+
+  for key, _ in pairs(settings) do
+    table.insert(theme_keys, key)
   end
 
-  if colour ~= nil then
-    span.attributes['colour'] = nil
-    span.attributes['color'] = nil
-    span.attributes['style'] = span.attributes['style'] .. 'color: ' .. colour .. ';'
+  for _, theme in ipairs(theme_keys) do
+    local theme_span = pandoc.Span(span.content)
+    local colour = settings[theme].colour
+    local bg_colour = settings[theme].bg_colour
+
+    for k, v in pairs(span.attributes) do
+      theme_span.attributes[k] = v
+    end
+
+    if theme_span.attributes['style'] == nil then
+      theme_span.attributes['style'] = ''
+    elseif theme_span.attributes['style']:sub(-1) ~= ";" then
+      theme_span.attributes['style'] = theme_span.attributes['style'] .. ";"
+    end
+
+    theme_span.classes = theme_span.classes or {}
+    table.insert(theme_span.classes, "quarto-highlight-text-" .. theme)
+
+    if colour ~= nil then
+      theme_span.attributes['colour'] = nil
+      theme_span.attributes['color'] = nil
+      theme_span.attributes['style'] = theme_span.attributes['style'] .. 'color: ' .. colour .. ';'
+    end
+
+    if bg_colour ~= nil then
+      theme_span.attributes['bg-colour'] = nil
+      theme_span.attributes['bg-color'] = nil
+      theme_span.attributes['style'] = theme_span.attributes['style'] ..
+        'border-radius: 0.2rem; padding: 0 0.2rem 0 0.2rem;' .. 'background-color: ' .. bg_colour .. ';'
+    end
+
+    table.insert(result, theme_span)
   end
 
-  if bg_colour ~= nil then
-    span.attributes['bg-colour'] = nil
-    span.attributes['bg-color'] = nil
-    span.attributes['style'] = span.attributes['style'] .. 'border-radius: 0.2rem; padding: 0 0.2rem 0 0.2rem;' .. 'background-color: ' .. bg_colour .. ';'
+  -- Return a single span or a list of spans
+  if #result == 1 then
+    return result[1]
+  else
+    return result
   end
-
-  return span
 end
 
 --- Applies text and background colour styling for LaTeX-based outputs
@@ -203,15 +230,31 @@ local function highlight(span)
     bg_colour = span.attributes['bg-color']
   end
 
-  local brand = span.attributes['brand']
-  if brand == nil then
-    brand = "light"
+  local highlight_settings = {}
+
+  local modes = {"light", "dark"}
+  for _, mode in ipairs(modes) do
+    if quarto.brand.has_mode(mode) then
+      highlight_settings[mode] = {
+        colour = get_brand_colour(mode, colour),
+        bg_colour = get_brand_colour(mode, bg_colour)
+      }
+    end
   end
 
-  if colour == nil and bg_colour == nil then return span end
+  if highlight_settings.light == nil and highlight_settings.dark == nil then
+    return span
+  end
 
-  colour = get_brand_colour(brand, colour)
-  bg_colour = get_brand_colour(brand, bg_colour)
+  if highlight_settings.light == nil then
+    highlight_settings.light = highlight_settings.dark
+  end
+
+  colour = highlight_settings.light.colour
+  bg_colour = highlight_settings.light.bg_colour
+
+  quarto.log.output(highlight_settings)
+  if colour == nil and bg_colour == nil then return span end
 
   if span.attributes['par'] == nil then
     par = false
@@ -221,7 +264,11 @@ local function highlight(span)
   end
 
   if FORMAT:match 'html' or FORMAT:match 'revealjs' then
-    return highlight_html(span, colour, bg_colour)
+    quarto.doc.add_html_dependency({
+      name = 'badge',
+      stylesheets = {"light-dark.css"}
+    })
+    return highlight_html(span, highlight_settings)
   elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
     return highlight_latex(span, colour, bg_colour, par)
   elseif FORMAT:match 'docx' then

@@ -46,17 +46,22 @@ color:
 [Red]{colour="brand-color.red" bg-colour="brand-color.primary"}
 ```
 
-Using colours from dark/light themes with Quarto CLI >=1.7.20 ([v1.2.0](../../releases/tag/1.2.0)):
+Using colours from light/dark themes with Quarto CLI >=1.7.28 ([v1.2.0](../../releases/tag/1.2.0)):
 
 - From document front matter:
 
   ```yaml
   brand:
+    light:
+      color:
+        palette:
+          fg: "#ffffff"
+          bg: "#b22222"
     dark:
       color:
         palette:
-          red: "#b22222"
-        primary: "#abc123"
+          fg: "#b22222"
+          bg: "#ffffff"
   ```
 
 - From `_quarto.yml` and `_brand.yml` file
@@ -67,8 +72,12 @@ Using colours from dark/light themes with Quarto CLI >=1.7.20 ([v1.2.0](../../re
   ```
 
 ```markdown
-[Red]{colour="brand-color.red" bg-colour="brand-color.primary" brand="dark"}
+[Light: White/Red | Dark: Red/White]{colour="brand-color.fg" bg-colour="brand-color.bg"}
 ```
+
+> [!NOTE]
+> Only the `html` support light/dark mode switching.
+> The other formats will use the light mode colours if available or the dark mode colours otherwise.
 
 ## Limitations
 
