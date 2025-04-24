@@ -1,0 +1,9 @@
+body.quarto-light .quarto-highlight-text-light,
+body.quarto-dark .quarto-highlight-text-dark {
+  display: inline;
+}
+
+body.quarto-light .quarto-highlight-text-dark,
+body.quarto-dark .quarto-highlight-text-light {
+  display: none;
+}
