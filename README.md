@@ -89,6 +89,8 @@ In order to get a slightly better result, you can use the `par=true` attribute t
 [Red]{colour="#b22222" bg-colour="#abc123" par=true}
 ```
 
+Use `pdf-engine: lualatex` in your YAML front matter to use the `luatex` engine and fully alleviate the above issue.
+
 ## Examples
 
 Here is the source code for a minimal example: [`example.qmd`](example.qmd).
