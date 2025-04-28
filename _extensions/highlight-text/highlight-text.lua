@@ -252,7 +252,6 @@ local function highlight(span)
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
 
-  quarto.log.output(highlight_settings)
   if colour == nil and bg_colour == nil then return span end
 
   if span.attributes['par'] == nil then
