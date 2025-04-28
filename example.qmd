@@ -38,7 +38,19 @@ format:
     aspectratio: 169
   pptx:
     output-file: highlight-pptx
-format-links: true
+format-links:
+  - html
+  - typst
+  - format: pdf-xelatex
+    text: "PDF (XeLaTeX)"
+  - format: pdf-lualatex
+    text: "PDF (LuaLaTeX)"
+  - format: pdf-pdflatex
+    text: "PDF (PDFLaTeX)"
+  - docx
+  - revealjs
+  - beamer
+  - pptx
 embed-resources: true
 execute:
   echo: true
