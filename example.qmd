@@ -9,8 +9,22 @@ format:
     margin:
       x: 2.5cm
       y: 2.5cm
-  pdf:
-    output-file: highlight-latex
+  pdf-xelatex:
+    output-file: highlight-xelatex
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
+  pdf-lualatex:
+    output-file: highlight-lualatex
+    pdf-engine: lualatex
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
+  pdf-pdflatex:
+    output-file: highlight-pdflatex
+    pdf-engine: lualatex
     papersize: a4
     margin:
       x: 2.5cm
@@ -144,7 +158,7 @@ Then you can use the span syntax markup to highlight text in your document.
 
 [Light: White/Red | Dark: Red/White]{colour="brand-color.fg" bg-colour="brand-color.bg"}
 
-## Limitations
+## Limitations `xelatex` and `pdflatex`
 
 LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
 This means that the above example will not work well in LaTeX output.
@@ -167,3 +181,5 @@ In order to get a slightly better result, you can use the `par=true` attribute t
   LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
 This means that the above example will not work well in LaTeX output.
 ]{colour="#b22222" bg-colour="#abc123" par=true}
+
+Use `pdf-engine: lualatex` in the YAML front matter to get the best result.

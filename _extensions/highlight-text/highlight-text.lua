@@ -98,6 +98,12 @@ end
 --- @param par boolean Whether to wrap in a paragraph box
 --- @return table The span content with LaTeX markup
 local function highlight_latex(span, colour, bg_colour, par)
+  local is_lualatex = quarto.doc.pdf_engine() == "lualatex"
+  
+  if is_lualatex and bg_colour ~= nil then
+    quarto.doc.use_latex_package("luacolor, lua-ul")
+  end
+  
   if colour == nil then
     colour_open = ''
     colour_close = ''
@@ -105,15 +111,21 @@ local function highlight_latex(span, colour, bg_colour, par)
     colour_open = '\\textcolor[HTML]{' .. colour:gsub("^#", "") .. '}{'
     colour_close = '}'
   end
+  
   if bg_colour == nil then
     bg_colour_open = ''
     bg_colour_close = ''
   else
-    bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{'
-    bg_colour_close = '}'
+    if is_lualatex then
+      bg_colour_open = '\\highLight[{[HTML]{' .. bg_colour:gsub("^#", "") .. '}}]{'
+      bg_colour_close = '}'
+    else
+      bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{'
+      bg_colour_close = '}'
+    end
   end
 
-  if par then
+  if par and not is_lualatex then
     bg_colour_open = bg_colour_open .. '\\parbox{\\linewidth}{'
     bg_colour_close = '}' .. bg_colour_close
   end
@@ -252,7 +264,6 @@ local function highlight(span)
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
 
-  quarto.log.output(highlight_settings)
   if colour == nil and bg_colour == nil then return span end
 
   if span.attributes['par'] == nil then
