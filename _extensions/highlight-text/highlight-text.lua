@@ -66,7 +66,7 @@ local function highlight_html(span, settings)
     end
 
     theme_span.classes = theme_span.classes or {}
-    table.insert(theme_span.classes, "quarto-highlight-text-" .. theme)
+    table.insert(theme_span.classes, theme .. '-content')
 
     if colour ~= nil then
       theme_span.attributes['colour'] = nil
@@ -274,10 +274,6 @@ local function highlight(span)
   end
 
   if FORMAT:match 'html' or FORMAT:match 'revealjs' then
-    quarto.doc.add_html_dependency({
-      name = 'badge',
-      stylesheets = {"light-dark.css"}
-    })
     return highlight_html(span, highlight_settings)
   elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
     return highlight_latex(span, colour, bg_colour, par)
