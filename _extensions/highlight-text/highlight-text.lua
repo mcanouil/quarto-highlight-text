@@ -28,8 +28,8 @@
 --- @return string The processed colour value
 local function get_brand_colour(theme, colour)
   local brand = require('modules/brand/brand')
-  if colour and colour:match("^brand%-color.") then
-    colour = brand.get_color(theme, colour:gsub("^brand%-color%.", ""))
+  if colour and colour:match('^brand%-color.') then
+    colour = brand.get_color(theme, colour:gsub('^brand%-color%.', ''))
   else
     if FORMAT:match 'typst' and colour  ~= nil then
       colour = 'rgb("' .. colour .. '")'
@@ -61,12 +61,12 @@ local function highlight_html(span, settings)
 
     if theme_span.attributes['style'] == nil then
       theme_span.attributes['style'] = ''
-    elseif theme_span.attributes['style']:sub(-1) ~= ";" then
-      theme_span.attributes['style'] = theme_span.attributes['style'] .. ";"
+    elseif theme_span.attributes['style']:sub(-1) ~= ';' then
+      theme_span.attributes['style'] = theme_span.attributes['style'] .. ';'
     end
 
     theme_span.classes = theme_span.classes or {}
-    table.insert(theme_span.classes, "quarto-highlight-text-" .. theme)
+    table.insert(theme_span.classes, 'quarto-highlight-text-' .. theme)
 
     if colour ~= nil then
       theme_span.attributes['colour'] = nil
@@ -98,17 +98,17 @@ end
 --- @param par boolean Whether to wrap in a paragraph box
 --- @return table The span content with LaTeX markup
 local function highlight_latex(span, colour, bg_colour, par)
-  local is_lualatex = quarto.doc.pdf_engine() == "lualatex"
+  local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
   
   if is_lualatex and bg_colour ~= nil then
-    quarto.doc.use_latex_package("luacolor, lua-ul")
+    quarto.doc.use_latex_package('luacolor, lua-ul')
   end
   
   if colour == nil then
     colour_open = ''
     colour_close = ''
   else
-    colour_open = '\\textcolor[HTML]{' .. colour:gsub("^#", "") .. '}{'
+    colour_open = '\\textcolor[HTML]{' .. colour:gsub('^#', '') .. '}{'
     colour_close = '}'
   end
   
@@ -117,10 +117,10 @@ local function highlight_latex(span, colour, bg_colour, par)
     bg_colour_close = ''
   else
     if is_lualatex then
-      bg_colour_open = '\\highLight[{[HTML]{' .. bg_colour:gsub("^#", "") .. '}}]{'
+      bg_colour_open = '\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
       bg_colour_close = '}'
     else
-      bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub("^#", "") .. '}{'
+      bg_colour_open = '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{'
       bg_colour_close = '}'
     end
   end
@@ -147,10 +147,10 @@ end
 local function highlight_openxml_docx(span, colour, bg_colour)
   local spec = '<w:r><w:rPr>'
   if bg_colour ~= nil then
-    spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub("^#", "") .. '"/>'
+    spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub('^#', '') .. '"/>'
   end
   if colour ~= nil then
-    spec = spec .. '<w:color w:val="' .. colour:gsub("^#", "") .. '"/>'
+    spec = spec .. '<w:color w:val="' .. colour:gsub('^#', '') .. '"/>'
   end
   spec = spec .. '</w:rPr><w:t>'
 
@@ -168,17 +168,17 @@ end
 local function highlight_openxml_pptx(span, colour, bg_colour)
   local spec = '<a:r><a:rPr dirty="0">'
   if colour ~= nil then
-    spec = spec .. '<a:solidFill><a:srgbClr val="' .. colour:gsub("^#", "") .. '" /></a:solidFill>'
+    spec = spec .. '<a:solidFill><a:srgbClr val="' .. colour:gsub('^#', '') .. '" /></a:solidFill>'
   end
   if bg_colour ~= nil then
-    spec = spec .. '<a:highlight><a:srgbClr val="' .. bg_colour:gsub("^#", "") .. '" /></a:highlight>'
+    spec = spec .. '<a:highlight><a:srgbClr val="' .. bg_colour:gsub('^#', '') .. '" /></a:highlight>'
   end
   spec = spec .. '</a:rPr><a:t>'
 
   -- table.insert(span.content, 1, pandoc.RawInline('openxml', spec))
   -- table.insert(span.content, pandoc.RawInline('openxml', '</a:t></a:r>'))
 
-  local span_content_string = ""
+  local span_content_string = ''
   for i, inline in ipairs(span.content) do
     span_content_string = span_content_string .. pandoc.utils.stringify(inline)
   end
@@ -243,7 +243,7 @@ local function highlight(span)
 
   local highlight_settings = {}
 
-  local modes = {"light", "dark"}
+  local modes = {'light', 'dark'}
   for _, mode in ipairs(modes) do
     if quarto.brand.has_mode(mode) then
       highlight_settings[mode] = {
@@ -273,19 +273,19 @@ local function highlight(span)
     span.attributes['par'] = nil
   end
 
-  if FORMAT:match 'html' or FORMAT:match 'revealjs' then
+  if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     quarto.doc.add_html_dependency({
       name = 'badge',
-      stylesheets = {"light-dark.css"}
+      stylesheets = {'light-dark.css'}
     })
     return highlight_html(span, highlight_settings)
-  elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
+  elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
     return highlight_latex(span, colour, bg_colour, par)
-  elseif FORMAT:match 'docx' then
+  elseif quarto.doc.is_format('docx') then
     return highlight_openxml_docx(span, colour, bg_colour)
-  elseif FORMAT:match 'pptx' then
+  elseif quarto.doc.is_format('pptx') then
     return highlight_openxml_pptx(span, colour, bg_colour)
-  elseif FORMAT:match 'typst' then
+  elseif quarto.doc.is_format('typst') then
     return highlight_typst(span, colour, bg_colour)
   else
     return span
