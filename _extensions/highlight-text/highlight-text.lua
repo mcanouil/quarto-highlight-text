@@ -39,7 +39,7 @@ local function get_brand_colour(theme, colour)
 end
 
 --- Applies text and background colour styling for HTML-based outputs
---- @param span table The span/div element to modify
+--- @param span table The span element to modify
 --- @param settings table The highlight settings containing colour and background colour
 --- @return table The modified span with HTML styling
 local function highlight_html(span, settings)
@@ -52,9 +52,6 @@ local function highlight_html(span, settings)
 
   for _, theme in ipairs(theme_keys) do
     local theme_span = pandoc.Span(span.content)
-    if span.t == 'Div' then
-      theme_span = pandoc.Div(span.content)
-    end
     local colour = settings[theme].colour
     local bg_colour = settings[theme].bg_colour
 
@@ -223,9 +220,9 @@ local function highlight_typst(span, colour, bg_colour)
   return span.content
 end
 
---- Main filter function that processes span/div elements and applies highlighting
+--- Main filter function that processes span elements and applies highlighting
 --- based on the output format and specified attributes
---- @param span table The span or div element from the document
+--- @param span table The span element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
   local colour = span.attributes['fg']
