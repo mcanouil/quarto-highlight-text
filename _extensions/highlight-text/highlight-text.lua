@@ -39,7 +39,7 @@ local function get_brand_colour(theme, colour)
 end
 
 --- Applies text and background colour styling for HTML-based outputs
---- @param span table The span element to modify
+--- @param span table The span/div element to modify
 --- @param settings table The highlight settings containing colour and background colour
 --- @return table The modified span with HTML styling
 local function highlight_html(span, settings)
@@ -52,6 +52,9 @@ local function highlight_html(span, settings)
 
   for _, theme in ipairs(theme_keys) do
     local theme_span = pandoc.Span(span.content)
+    if span.t == 'Div' then
+      theme_span = pandoc.Div(span.content)
+    end
     local colour = settings[theme].colour
     local bg_colour = settings[theme].bg_colour
 
@@ -66,7 +69,7 @@ local function highlight_html(span, settings)
     end
 
     theme_span.classes = theme_span.classes or {}
-    table.insert(theme_span.classes, 'quarto-highlight-text-' .. theme)
+    table.insert(theme_span.classes, theme .. '-content')
 
     if colour ~= nil then
       theme_span.attributes['colour'] = nil
@@ -220,9 +223,9 @@ local function highlight_typst(span, colour, bg_colour)
   return span.content
 end
 
---- Main filter function that processes span elements and applies highlighting
+--- Main filter function that processes span/div elements and applies highlighting
 --- based on the output format and specified attributes
---- @param span table The span element from the document
+--- @param span table The span or div element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
   local colour = span.attributes['fg']
@@ -274,10 +277,6 @@ local function highlight(span)
   end
 
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
-    quarto.doc.add_html_dependency({
-      name = 'badge',
-      stylesheets = {'light-dark.css'}
-    })
     return highlight_html(span, highlight_settings)
   elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
     return highlight_latex(span, colour, bg_colour, par)
