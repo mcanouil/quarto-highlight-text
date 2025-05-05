@@ -242,15 +242,22 @@ local function highlight(span)
   end
 
   local highlight_settings = {}
-
-  local modes = {'light', 'dark'}
-  for _, mode in ipairs(modes) do
-    if quarto.brand.has_mode(mode) then
-      highlight_settings[mode] = {
-        colour = get_brand_colour(mode, colour),
-        bg_colour = get_brand_colour(mode, bg_colour)
-      }
+  if quarto.brand.has_mode('light') or quarto.brand.has_mode('dark') then
+    local modes = {'light', 'dark'}
+    
+    for _, mode in ipairs(modes) do
+      if quarto.brand.has_mode(mode) then
+        highlight_settings[mode] = {
+          colour = get_brand_colour(mode, colour),
+          bg_colour = get_brand_colour(mode, bg_colour)
+        }
+      end
     end
+  else
+    highlight_settings.light = {
+      colour = get_brand_colour('light', colour),
+      bg_colour = get_brand_colour('light', bg_colour)
+    }
   end
 
   if highlight_settings.light == nil and highlight_settings.dark == nil then
