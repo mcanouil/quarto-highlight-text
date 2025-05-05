@@ -99,7 +99,9 @@ Outputs of `example.qmd`:
 
 - [HTML](https://m.canouil.dev/quarto-highlight-text/)
 - [Typst/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-typst.pdf)
-- [LaTeX/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-latex.pdf)
+- [LaTeX/PDF (XeLaTeX)](https://m.canouil.dev/quarto-highlight-text/highlight-xelatex.pdf)
+- [LaTeX/PDF (LuaLaTeX)](https://m.canouil.dev/quarto-highlight-text/highlight-lualatex.pdf)
+- [LaTeX/PDF (PDFLaTeX)](https://m.canouil.dev/quarto-highlight-text/highlight-pdflatex.pdf)
 - [Word/Docx](https://m.canouil.dev/quarto-highlight-text/highlight-openxml.docx) (**only supports plain text, *i.e.*, no URLs**)
 - [Reveal.js](https://m.canouil.dev/quarto-highlight-text/highlight-revealjs.html)
 - [Beamer/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-beamer.pdf)
