@@ -22,17 +22,40 @@
 # SOFTWARE.
 ]]
 
+--- Flag to track if deprecation warning has been shown
+--- @type boolean
+local deprecation_warning_shown = false
+
 --- Gets a colour value from brand theme or formats it for later use
 --- @param theme string The brand theme to use (light/dark)
 --- @param colour string The colour value or brand colour reference
 --- @return string The processed colour value
 local function get_brand_colour(theme, colour)
   local brand = require('modules/brand/brand')
-  if colour and colour:match('^brand%-color.') then
-    colour = brand.get_color(theme, colour:gsub('^brand%-color%.', ''))
-  else
-    if FORMAT:match 'typst' and colour  ~= nil then
-      colour = 'rgb("' .. colour .. '")'
+
+
+  if colour then
+    local brand_colour_key = colour
+
+    -- Check for deprecated "brand-color." prefix
+    brand_colour_key = colour:gsub('^brand%-color%.', '')
+    if not deprecation_warning_shown then
+      if colour:match("^brand%-color%.") then
+        quarto.log.warning(
+          'Using "brand-color." prefix is deprecated.' ..
+          ' Please use the colour name directly (e.g., "' .. brand_colour_key .. '" instead of "' .. colour .. '").'
+        )
+        deprecation_warning_shown = true
+      end
+    end
+
+    local brand_colour = brand.get_color(theme, brand_colour_key)
+    if brand_colour ~= nil then
+      colour = brand_colour
+    else
+      if FORMAT:match 'typst' and colour ~= nil then
+        colour = 'rgb("' .. colour .. '")'
+      end
     end
   end
   return colour
@@ -78,7 +101,7 @@ local function highlight_html(span, settings)
       theme_span.attributes['bg-colour'] = nil
       theme_span.attributes['bg-color'] = nil
       theme_span.attributes['style'] = theme_span.attributes['style'] ..
-        'border-radius: 0.2rem; padding: 0 0.2rem 0 0.2rem;' .. 'background-color: ' .. bg_colour .. ';'
+          'border-radius: 0.2rem; padding: 0 0.2rem 0 0.2rem;' .. 'background-color: ' .. bg_colour .. ';'
     end
 
     table.insert(result, theme_span)
@@ -99,11 +122,11 @@ end
 --- @return table The span content with LaTeX markup
 local function highlight_latex(span, colour, bg_colour, par)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
-  
+
   if is_lualatex and bg_colour ~= nil then
     quarto.doc.use_latex_package('luacolor, lua-ul')
   end
-  
+
   if colour == nil then
     colour_open = ''
     colour_close = ''
@@ -111,7 +134,7 @@ local function highlight_latex(span, colour, bg_colour, par)
     colour_open = '\\textcolor[HTML]{' .. colour:gsub('^#', '') .. '}{'
     colour_close = '}'
   end
-  
+
   if bg_colour == nil then
     bg_colour_open = ''
     bg_colour_close = ''
@@ -243,8 +266,8 @@ local function highlight(span)
 
   local highlight_settings = {}
   if quarto.brand.has_mode('light') or quarto.brand.has_mode('dark') then
-    local modes = {'light', 'dark'}
-    
+    local modes = { 'light', 'dark' }
+
     for _, mode in ipairs(modes) do
       if quarto.brand.has_mode(mode) then
         highlight_settings[mode] = {

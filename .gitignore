@@ -6,3 +6,4 @@ _quarto.yml
 *.docx
 *.pptx
 *_files/
+**/*.quarto_ipynb

@@ -1,6 +1,6 @@
 # Highlight-text Extension For Quarto
 
-This is a Quarto extension that allows to highlight text in a document for various format: HTML, LaTeX, Typst, and Docx.
+This is a Quarto extension that allows to highlight text in a document for various formats: HTML, LaTeX, Typst, Docx, PowerPoint, Reveal.js, and Beamer.
 
 ## Installing
 
@@ -20,76 +20,123 @@ filters:
   - highlight-text
 ```
 
-Then you can use the span syntax markup to highlight text in your document, *e.g.*:
+Then you can use the span syntax markup to highlight text in your document.
+
+### Basic Syntax
+
+The extension supports both British and American English spelling for colour attributes:
 
 ```markdown
-[Red]{colour="#b22222" bg-colour="#abc123"} # UK
-[Blue]{color="#0000FF" bg-color="#ABC123"} # US
+[Red]{colour="#b22222" bg-colour="#abc123"} # UK spelling
+[Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
 ```
 
-You can also use the shorter syntax ([v1.1.1](../../releases/tag/1.1.1)):
+### Shorter Syntax
+
+You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 
 ```markdown
-[Red]{fg="red" bg="primary"}
+[Red text]{fg="#b22222"}
+[Red background]{bg="#abc123"}
+[White on Red]{fg="#ffffff" bg="#b22222"}
 ```
 
-Using colours from `_brand.yml` ([v1.1.0](../../releases/tag/1.1.0)):
+Supported attributes:
+
+- **Foreground (text) colour**: `fg`, `colour`, or `color`
+- **Background colour**: `bg`, `bg-colour`, or `bg-color`
+
+### Using Brand Colours
+
+Define colours once in `_brand.yml` and reference them throughout your documents ([v1.1.0](../../releases/tag/1.1.0)):
 
 ```yaml
 color:
   palette:
     red: "#b22222"
+    custom-blue: "#0000ff"
   primary: "#abc123"
 ```
 
-```markdown
-[Red]{colour="brand-color.red" bg-colour="brand-color.primary"}
-```
-
-Using colours from light/dark themes with Quarto CLI >=1.7.28 ([v1.2.0](../../releases/tag/1.2.0)):
-
-- From document front matter:
-
-  ```yaml
-  brand:
-    light:
-      color:
-        palette:
-          fg: "#ffffff"
-          bg: "#b22222"
-    dark:
-      color:
-        palette:
-          fg: "#b22222"
-          bg: "#ffffff"
-  ```
-
-- From `_quarto.yml` and `_brand.yml` file
-
-  ```yaml
-  brand:
-    dark: _brand.yml
-  ```
+Reference these colours directly by name:
 
 ```markdown
-[Light: White/Red | Dark: Red/White]{colour="brand-color.fg" bg-colour="brand-color.bg"}
+[Red text]{fg="red"}
+[Custom background]{bg="custom-blue"}
+[Primary highlight]{bg="primary"}
 ```
 
 > [!NOTE]
-> Only the `html` support light/dark mode switching.
-> The other formats will use the light mode colours if available or the dark mode colours otherwise.
+> The old `brand-color.` prefix syntax (e.g., `colour="brand-color.red"`) is deprecated but still supported ([v1.4.0](../../releases/tag/1.4.0)).
+> You'll see a warning when using it.
+> Use the colour name directly instead: `colour="red"`.
+
+### Light/Dark Theme Support
+
+With Quarto CLI ≥1.7.28, you can define different colours for light and dark themes ([v1.2.0](../../releases/tag/1.2.0)):
+
+**Option 1**: Define themes in document front matter:
+
+```yaml
+brand:
+  light:
+    color:
+      palette:
+        fg: "#ffffff"
+        bg: "#b22222"
+  dark:
+    color:
+      palette:
+        fg: "#b22222"
+        bg: "#ffffff"
+```
+
+**Option 2**: Use external `_brand.yml` file:
+
+```yaml
+brand:
+  light: _brand.yml
+  dark: _brand-dark.yml
+```
+
+Then reference theme-aware colours:
+
+```markdown
+[This text adapts to theme]{fg="fg" bg="bg"}
+```
+
+> [!NOTE]
+> Only HTML formats support dynamic light/dark mode switching.
+> Other formats will use the light mode colours if available, or fall back to dark mode colours otherwise, unless specified otherwise.
 
 ## Limitations
 
-LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
-This means that the above example will not work well in LaTeX output.  
-In order to get a slightly better result, you can use the `par=true` attribute to add `\parbox{\linewidth}`:
+### LaTeX/PDF Output
+
+The LaTeX `\colorbox` command does not support line wrapping for highlighted text with background colours.
+Long highlighted text may overflow or break awkwardly.
+
+**Workaround for XeLaTeX and PDFLaTeX**: Use the `par=true` attribute to add `\parbox{\linewidth}`:
 
 ```markdown
-[Red]{colour="#b22222" bg-colour="#abc123" par=true}
+[Long text with background]{colour="#b22222" bg-colour="#abc123" par=true}
 ```
 
-Use `pdf-engine: lualatex` in your YAML front matter to use the `luatex` engine and fully alleviate the above issue.
+**Best solution**: Use LuaLaTeX as your PDF engine for proper line wrapping with the `lua-ul` package:
+
+```yaml
+format:
+  pdf:
+    pdf-engine: lualatex
+```
+
+> [!NOTE]
+> LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
+
+### Word and PowerPoint Output
+
+Docx and Pptx formats only support highlighting plain text.
+Links and other inline formatting within highlighted spans may not render correctly.
 
 ## Examples
 
