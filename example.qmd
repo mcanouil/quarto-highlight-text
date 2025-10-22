@@ -103,7 +103,7 @@ Then you can use the span syntax markup to highlight text in your document.
 ```markdown
 [Red]{colour="#b22222" bg-colour="#abc123"} # UK spelling
 [Red]{fg="#b22222" bg="#abc123"} # Shorter syntax
-[Blue]{color="#0000FF" bg-color="#ABC123"} # US spelling
+[Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
 ```
 
 ## Font Colour
@@ -115,10 +115,10 @@ Then you can use the span syntax markup to highlight text in your document.
 [Red text]{colour="#b22222"}
 
 ```markdown
-[Blue text]{color="#0000FF"}
+[Blue text]{color="#0000ff"}
 ```
 
-[Blue text]{color="#0000FF"}
+[Blue text]{color="#0000ff"}
 
 ## Background Colour
 
@@ -129,39 +129,39 @@ Then you can use the span syntax markup to highlight text in your document.
 [Red background]{bg-colour="#b22222"}
 
 ```markdown
-[Blue background]{bg-color="#0000FF"}
+[Blue background]{bg-color="#0000ff"}
 ```
 
-[Blue background]{bg-color="#0000FF"}
+[Blue background]{bg-color="#0000ff"}
 
 ## Font and Background Colour
 
 ```markdown
 [White text, Red background]{
-  fg="#FFFFFF" bg="#b22222"
+  fg="#ffffff" bg="#b22222"
 }
 ```
 
-[White text, Red background]{fg="#FFFFFF" bg="#b22222"}
+[White text, Red background]{fg="#ffffff" bg="#b22222"}
 
 ```markdown
 [White text, Blue background]{
-  colour="#FFFFFF" bg-colour="#0000FF"
+  colour="#ffffff" bg-colour="#0000ff"
 }
 ```
 
-[White text, Blue background]{colour="#FFFFFF" bg-colour="#0000FF"}
+[White text, Blue background]{colour="#ffffff" bg-colour="#0000ff"}
 
 ## More Examples
 
 ```markdown
 [text [with a link](https://quarto.org/)]{
-  color="#FFFFFF" bg-color="#00FFFF"
+  color="#ffffff" bg-color="#00ffff"
 }
 ```
 
 [text [with a link](https://quarto.org/)]{
-  color="#FFFFFF" bg-color="#00FFFF"
+  color="#ffffff" bg-color="#00ffff"
 }
 
 ## Brand Colours

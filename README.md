@@ -28,7 +28,7 @@ The extension supports both British and American English spelling for colour att
 
 ```markdown
 [Red]{colour="#b22222" bg-colour="#abc123"} # UK spelling
-[Blue]{color="#0000FF" bg-color="#ABC123"} # US spelling
+[Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
 ```
 
 ### Shorter Syntax
@@ -54,7 +54,7 @@ Define colours once in `_brand.yml` and reference them throughout your documents
 color:
   palette:
     red: "#b22222"
-    custom-blue: "#0000FF"
+    custom-blue: "#0000ff"
   primary: "#abc123"
 ```
 
