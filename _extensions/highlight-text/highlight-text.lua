@@ -127,6 +127,7 @@ local function highlight_latex(span, colour, bg_colour, par)
     quarto.doc.use_latex_package('luacolor, lua-ul')
   end
 
+  local colour_open, colour_close
   if colour == nil then
     colour_open = ''
     colour_close = ''
@@ -135,6 +136,7 @@ local function highlight_latex(span, colour, bg_colour, par)
     colour_close = '}'
   end
 
+  local bg_colour_open, bg_colour_close
   if bg_colour == nil then
     bg_colour_open = ''
     bg_colour_close = ''
@@ -215,6 +217,7 @@ end
 --- @param bg_colour string The background colour to apply
 --- @return table The span content with Typst markup
 local function highlight_typst(span, colour, bg_colour)
+  local colour_open, colour_close
   if colour == nil then
     colour_open = ''
     colour_close = ''
@@ -223,6 +226,7 @@ local function highlight_typst(span, colour, bg_colour)
     colour_close = ']'
   end
 
+  local bg_colour_open, bg_colour_close
   if bg_colour == nil then
     bg_colour_open = ''
     bg_colour_close = ''
@@ -296,6 +300,7 @@ local function highlight(span)
 
   if colour == nil and bg_colour == nil then return span end
 
+  local par
   if span.attributes['par'] == nil then
     par = false
   else
