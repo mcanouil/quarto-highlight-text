@@ -75,16 +75,17 @@ brand:
 
 This is a Quarto extension that allows to highlight text in a document for various formats: HTML, LaTeX, Typst, Docx, PowerPoint, Reveal.js, and Beamer.
 
-## Installing
+## Installation
 
 ```bash
 quarto add mcanouil/quarto-highlight-text
 ```
 
 This will install the extension under the `_extensions` subdirectory.
+
 If you're using version control, you will want to check in this directory.
 
-## Using
+## Usage
 
 To use the extension, add the following to your document's front matter:
 
