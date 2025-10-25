@@ -1,9 +1,15 @@
 ---
 title: "Highlight-text Quarto Extension"
-toc: true
+subtitle: "Quarto Extension"
+author:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
 format:
   html:
     output-file: index
+    toc: true
+    embed-resources: true
   typst:
     output-file: highlight-typst
     papersize: a4
@@ -34,6 +40,7 @@ format:
     output-file: highlight-docx
   revealjs:
     output-file: highlight-revealjs
+    embed-resources: true
   beamer:
     output-file: highlight-beamer
     aspectratio: 169
@@ -52,7 +59,6 @@ format-links:
   - revealjs
   - beamer
   - pptx
-embed-resources: true
 execute:
   echo: true
 filters:
