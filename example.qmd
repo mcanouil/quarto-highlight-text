@@ -1,5 +1,6 @@
 ---
 title: "Highlight-text Quarto Extension"
+toc: true
 format:
   html:
     output-file: index
@@ -96,16 +97,29 @@ filters:
 
 Then you can use the span syntax markup to highlight text in your document.
 
-### Supported Attributes
+### Basic Syntax
 
-- **Foreground (text) colour**: `fg`, `colour`, or `color`
-- **Background colour**: `bg`, `bg-colour`, or `bg-color`
+The extension supports both British and American English spelling for colour attributes:
 
 ```markdown
 [Red]{colour="#b22222" bg-colour="#abc123"} # UK spelling
-[Red]{fg="#b22222" bg="#abc123"} # Shorter syntax
 [Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
 ```
+
+### Shorter Syntax
+
+You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
+
+```markdown
+[Red text]{fg="#b22222"}
+[Red background]{bg="#abc123"}
+[White on Red]{fg="#ffffff" bg="#b22222"}
+```
+
+Supported attributes:
+
+- **Foreground (text) colour**: `fg`, `colour`, or `color`
+- **Background colour**: `bg`, `bg-colour`, or `bg-color`
 
 ## Font Colour
 
@@ -165,7 +179,70 @@ Then you can use the span syntax markup to highlight text in your document.
   color="#ffffff" bg-color="#00ffff"
 }
 
-## Brand Colours
+### Using Brand Colours
+
+Define colours once in `_brand.yml` and reference them throughout your documents ([v1.1.0](../../releases/tag/1.1.0)):
+
+```yaml
+color:
+  palette:
+    red: "#b22222"
+    custom-blue: "#0000ff"
+  primary: "#abc123"
+```
+
+Reference these colours directly by name:
+
+```markdown
+[Red text]{fg="red"}
+[Custom background]{bg="custom-blue"}
+[Primary highlight]{bg="primary"}
+```
+
+> [!NOTE]
+> The old `brand-color.` prefix syntax (e.g., `colour="brand-color.red"`) is deprecated but still supported ([v1.4.0](../../releases/tag/1.4.0)).
+> You'll see a warning when using it.
+> Use the colour name directly instead: `colour="red"`.
+
+### Light and Dark Theme Support
+
+With Quarto CLI ≥1.7.28, you can define different colours for light and dark themes ([v1.2.0](../../releases/tag/1.2.0)):
+
+**Option 1**: Define themes in document front matter:
+
+```yaml
+brand:
+  light:
+    color:
+      palette:
+        fg: "#ffffff"
+        bg: "#b22222"
+  dark:
+    color:
+      palette:
+        fg: "#b22222"
+        bg: "#ffffff"
+```
+
+**Option 2**: Use external `_brand.yml` file:
+
+```yaml
+brand:
+  light: _brand.yml
+  dark: _brand-dark.yml
+```
+
+Then reference theme-aware colours:
+
+```markdown
+[This text adapts to theme]{fg="fg" bg="bg"}
+```
+
+> [!NOTE]
+> Only HTML formats support dynamic light/dark mode switching.
+> Other formats will use the light mode colours if available, or fall back to dark mode colours otherwise, unless specified otherwise.
+
+## Brand Colours Examples
 
 Using colours defined in the `brand` section of this document's front matter:
 
@@ -187,37 +264,20 @@ The old `brand-color.` prefix syntax still works but shows a deprecation warning
 
 > **Note**: Use the colour name directly without the `brand-color.` prefix (e.g., `fg="fg"` instead of `colour="brand-color.fg"`).
 
-## Limitations for XeLaTeX and PDFLaTeX
+## Limitations
 
-The LaTeX `\colorbox` command does not support wrapping/line breaks in highlighted text with background colours.
-Long highlighted text may overflow or break awkwardly in XeLaTeX and PDFLaTeX output.
+### LaTeX/PDF Output
 
-```markdown
-[Long text example without workaround]{colour="#b22222" bg-colour="#abc123"}
-```
+The LaTeX `\colorbox` command does not support line wrapping for highlighted text with background colours.
+Long highlighted text may overflow or break awkwardly.
 
-[
-  LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
-This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
-]{colour="#b22222" bg-colour="#abc123"}
-
-### Workaround: Using `par=true`
-
-For a slightly better result with XeLaTeX and PDFLaTeX, use the `par=true` attribute to add `\parbox{\linewidth}`:
+**Workaround for XeLaTeX and PDFLaTeX**: Use the `par=true` attribute to add `\parbox{\linewidth}`:
 
 ```markdown
-[Long text example with par=true]{colour="#b22222" bg-colour="#abc123" par=true}
+[Long text with background]{colour="#b22222" bg-colour="#abc123" par=true}
 ```
 
-[
-  LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
-This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
-]{colour="#b22222" bg-colour="#abc123" par=true}
-
-### Best Solution: Use LuaLaTeX
-
-For proper line wrapping with background highlighting, use `pdf-engine: lualatex` in your YAML front matter.
-LuaLaTeX uses the `lua-ul` package which fully supports line breaks in highlighted text:
+**Best solution**: Use LuaLaTeX as your PDF engine for proper line wrapping with the `lua-ul` package:
 
 ```yaml
 format:
@@ -228,3 +288,31 @@ format:
 :::: {.callout-note}
 LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
 :::
+
+**Example without workaround**:
+
+```markdown
+[Long text example without workaround]{colour="#b22222" bg-colour="#abc123"}
+```
+
+[
+  LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
+]{colour="#b22222" bg-colour="#abc123"}
+
+**Example with `par=true`**:
+
+```markdown
+[Long text example with par=true]{colour="#b22222" bg-colour="#abc123" par=true}
+```
+
+[
+  LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
+]{colour="#b22222" bg-colour="#abc123" par=true}
+
+### Word and PowerPoint Output
+
+Docx and Pptx formats only support highlighting plain text.
+
+Links and other inline formatting within highlighted spans may not render correctly.
