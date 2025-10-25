@@ -2,16 +2,17 @@
 
 This is a Quarto extension that allows to highlight text in a document for various formats: HTML, LaTeX, Typst, Docx, PowerPoint, Reveal.js, and Beamer.
 
-## Installing
+## Installation
 
 ```bash
 quarto add mcanouil/quarto-highlight-text
 ```
 
 This will install the extension under the `_extensions` subdirectory.
+
 If you're using version control, you will want to check in this directory.
 
-## Using
+## Usage
 
 To use the extension, add the following to your document's front matter:
 
@@ -71,7 +72,7 @@ Reference these colours directly by name:
 > You'll see a warning when using it.
 > Use the colour name directly instead: `colour="red"`.
 
-### Light/Dark Theme Support
+### Light and Dark Theme Support
 
 With Quarto CLI ≥1.7.28, you can define different colours for light and dark themes ([v1.2.0](../../releases/tag/1.2.0)):
 
@@ -136,13 +137,14 @@ format:
 ### Word and PowerPoint Output
 
 Docx and Pptx formats only support highlighting plain text.
+
 Links and other inline formatting within highlighted spans may not render correctly.
 
-## Examples
+## Example
 
 Here is the source code for a minimal example: [`example.qmd`](example.qmd).
 
-Outputs of `example.qmd`:
+Output of `example.qmd`:
 
 - [HTML](https://m.canouil.dev/quarto-highlight-text/)
 - [Typst/PDF](https://m.canouil.dev/quarto-highlight-text/highlight-typst.pdf)
