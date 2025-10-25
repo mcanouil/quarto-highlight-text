@@ -224,3 +224,7 @@ format:
   pdf:
     pdf-engine: lualatex
 ```
+
+:::: {.callout-note}
+LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
+:::
