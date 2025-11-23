@@ -43,6 +43,22 @@ format:
     output-file: highlight-revealjs
     embed-resources: true
     smaller: true
+    include-in-header:
+      - text: |
+          <!--
+            Light/Dark mode support for highlighted text.
+
+            https://github.com/quarto-dev/quarto-cli/issues/13722
+          -->
+          <style>
+            body.quarto-light .dark-content {
+              display: none !important;
+            }
+
+            body.quarto-dark .light-content {
+              display: none !important;
+            }
+          </style>
   beamer:
     output-file: highlight-beamer
     aspectratio: 169
