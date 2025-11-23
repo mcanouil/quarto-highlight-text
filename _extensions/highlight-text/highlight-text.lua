@@ -34,8 +34,8 @@ local deprecation_warning_shown = false
 
 --- Gets a colour value from brand theme or formats it for later use
 --- @param theme string The brand theme to use (light/dark)
---- @param colour string The colour value or brand colour reference
---- @return string The processed colour value
+--- @param colour string|nil The colour value or brand colour reference
+--- @return string|nil The processed colour value
 local function get_brand_colour(theme, colour)
   local brand = require('modules/brand/brand')
 
@@ -68,11 +68,13 @@ local function get_brand_colour(theme, colour)
   return colour
 end
 
---- Applies text and background colour styling for HTML-based outputs
---- @param span table The span element to modify
---- @param settings table The highlight settings containing colour and background colour
---- @return table The modified span with HTML styling
-local function highlight_html(span, settings)
+--- Applies HTML styling to an element
+--- @param element table The element to style
+--- @param settings table The highlight settings
+--- @param is_block boolean Whether this is a block-level element
+--- @param constructor any The Pandoc constructor (pandoc.Span or pandoc.Div)
+--- @return table The styled element(s)
+local function apply_html_styling(element, settings, is_block, constructor)
   local result = {}
   local theme_keys = {}
 
@@ -80,38 +82,40 @@ local function highlight_html(span, settings)
     table.insert(theme_keys, key)
   end
 
+  local padding = is_block and '0.5rem' or '0 0.2rem 0 0.2rem'
+
   for _, theme in ipairs(theme_keys) do
-    local theme_span = pandoc.Span(span.content)
+    local themed_element = constructor(element.content)
     local colour = settings[theme].colour
     local bg_colour = settings[theme].bg_colour
 
-    for k, v in pairs(span.attributes) do
-      theme_span.attributes[k] = v
+    for k, v in pairs(element.attributes) do
+      themed_element.attributes[k] = v
     end
 
-    if theme_span.attributes['style'] == nil then
-      theme_span.attributes['style'] = ''
-    elseif theme_span.attributes['style']:sub(-1) ~= ';' then
-      theme_span.attributes['style'] = theme_span.attributes['style'] .. ';'
+    if themed_element.attributes['style'] == nil then
+      themed_element.attributes['style'] = ''
+    elseif themed_element.attributes['style']:sub(-1) ~= ';' then
+      themed_element.attributes['style'] = themed_element.attributes['style'] .. ';'
     end
 
-    theme_span.classes = theme_span.classes or {}
-    table.insert(theme_span.classes, theme .. '-content')
+    themed_element.classes = themed_element.classes or {}
+    table.insert(themed_element.classes, theme .. '-content')
 
     if colour ~= nil then
-      theme_span.attributes['colour'] = nil
-      theme_span.attributes['color'] = nil
-      theme_span.attributes['style'] = theme_span.attributes['style'] .. 'color: ' .. colour .. ';'
+      themed_element.attributes['colour'] = nil
+      themed_element.attributes['color'] = nil
+      themed_element.attributes['style'] = themed_element.attributes['style'] .. 'color: ' .. colour .. ';'
     end
 
     if bg_colour ~= nil then
-      theme_span.attributes['bg-colour'] = nil
-      theme_span.attributes['bg-color'] = nil
-      theme_span.attributes['style'] = theme_span.attributes['style'] ..
-          'border-radius: 0.2rem; padding: 0 0.2rem 0 0.2rem;' .. 'background-color: ' .. bg_colour .. ';'
+      themed_element.attributes['bg-colour'] = nil
+      themed_element.attributes['bg-color'] = nil
+      themed_element.attributes['style'] = themed_element.attributes['style'] ..
+          'border-radius: 0.2rem; padding: ' .. padding .. ';' .. 'background-color: ' .. bg_colour .. ';'
     end
 
-    table.insert(result, theme_span)
+    table.insert(result, themed_element)
   end
 
   if #result == 1 then
@@ -119,6 +123,22 @@ local function highlight_html(span, settings)
   else
     return result
   end
+end
+
+--- Applies text and background colour styling for HTML-based outputs
+--- @param span table The span element to modify
+--- @param settings table The highlight settings containing colour and background colour
+--- @return table The modified span with HTML styling
+local function highlight_html(span, settings)
+  return apply_html_styling(span, settings, false, pandoc.Span)
+end
+
+--- Applies text and background colour styling for HTML-based outputs (block level)
+--- @param div table The div element to modify
+--- @param settings table The highlight settings containing colour and background colour
+--- @return table The modified div with HTML styling
+local function highlight_html_block(div, settings)
+  return apply_html_styling(div, settings, true, pandoc.Div)
 end
 
 --- Applies text and background colour styling for LaTeX-based outputs
@@ -171,6 +191,52 @@ local function highlight_latex(span, colour, bg_colour, par)
   return span.content
 end
 
+--- Applies text and background colour styling for LaTeX-based outputs (block level)
+--- @param div table The div element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table A modified div with LaTeX environment wrapping
+local function highlight_latex_block(div, colour, bg_colour)
+  local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
+
+  if bg_colour ~= nil then
+    if is_lualatex then
+      quarto.doc.use_latex_package('luacolor, lua-ul')
+    else
+      quarto.doc.use_latex_package('xcolor')
+    end
+  end
+
+  local latex_begin = ''
+  local latex_end = ''
+
+  if colour ~= nil and bg_colour ~= nil then
+    if is_lualatex then
+      latex_begin = '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
+      latex_end = '}}'
+    else
+      latex_begin = '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
+      latex_end = '}}'
+    end
+  elseif bg_colour ~= nil then
+    if is_lualatex then
+      latex_begin = '\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
+      latex_end = '}'
+    else
+      latex_begin = '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{'
+      latex_end = '}}'
+    end
+  elseif colour ~= nil then
+    latex_begin = '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
+    latex_end = '}'
+  end
+
+  table.insert(div.content, 1, pandoc.RawBlock('latex', latex_begin))
+  table.insert(div.content, pandoc.RawBlock('latex', latex_end))
+
+  return div.content
+end
+
 --- Applies text and background colour styling for Word documents
 --- @param span table The span element to modify
 --- @param colour string The text colour to apply
@@ -190,6 +256,34 @@ local function highlight_openxml_docx(span, colour, bg_colour)
   table.insert(span.content, pandoc.RawInline('openxml', '</w:t></w:r>'))
 
   return span.content
+end
+
+--- Applies text and background colour styling for Word documents (block level)
+--- @param div table The div element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table The div content with OpenXML markup for Word
+local function highlight_openxml_docx_block(div, colour, bg_colour)
+  local spec = '<w:pPr>'
+  if bg_colour ~= nil then
+    spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub('^#', '') .. '"/>'
+  end
+  spec = spec .. '</w:pPr>'
+
+  table.insert(div.content, 1, pandoc.RawBlock('openxml', spec))
+
+  if colour ~= nil then
+    for idx = 2, #div.content do
+      if div.content[idx].t == 'Para' or div.content[idx].t == 'Plain' then
+        local para = div.content[idx]
+        local colour_spec = '<w:r><w:rPr><w:color w:val="' .. colour:gsub('^#', '') .. '"/></w:rPr><w:t>'
+        table.insert(para.content, 1, pandoc.RawInline('openxml', colour_spec))
+        table.insert(para.content, pandoc.RawInline('openxml', '</w:t></w:r>'))
+      end
+    end
+  end
+
+  return div.content
 end
 
 --- Applies text and background colour styling for PowerPoint presentations
@@ -216,6 +310,36 @@ local function highlight_openxml_pptx(span, colour, bg_colour)
   end
 
   return pandoc.RawInline('openxml', spec .. span_content_string .. '</a:t></a:r>')
+end
+
+--- Applies text and background colour styling for PowerPoint presentations (block level)
+--- @param div table The div element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table The div content with OpenXML markup for PowerPoint
+local function highlight_openxml_pptx_block(div, colour, bg_colour)
+  for idx = 1, #div.content do
+    if div.content[idx].t == 'Para' or div.content[idx].t == 'Plain' then
+      local para = div.content[idx]
+      local para_content_string = ''
+      for _, inline in ipairs(para.content) do
+        para_content_string = para_content_string .. pandoc.utils.stringify(inline)
+      end
+
+      local spec = '<a:r><a:rPr dirty="0">'
+      if colour ~= nil then
+        spec = spec .. '<a:solidFill><a:srgbClr val="' .. colour:gsub('^#', '') .. '" /></a:solidFill>'
+      end
+      if bg_colour ~= nil then
+        spec = spec .. '<a:highlight><a:srgbClr val="' .. bg_colour:gsub('^#', '') .. '" /></a:highlight>'
+      end
+      spec = spec .. '</a:rPr><a:t>'
+
+      para.content = { pandoc.RawInline('openxml', spec .. para_content_string .. '</a:t></a:r>') }
+    end
+  end
+
+  return div.content
 end
 
 --- Applies text and background colour styling for Typst output
@@ -254,31 +378,61 @@ local function highlight_typst(span, colour, bg_colour)
   return span.content
 end
 
---- Main filter function that processes span elements and applies highlighting
---- based on the output format and specified attributes
---- @param span table The span element from the document
---- @return table The modified span or span content with appropriate styling
-local function highlight(span)
-  local colour = span.attributes['fg']
+--- Applies text and background colour styling for Typst output (block level)
+--- @param div table The div element to modify
+--- @param colour string The text colour to apply
+--- @param bg_colour string The background colour to apply
+--- @return table The div content with Typst markup
+local function highlight_typst_block(div, colour, bg_colour)
+  local colour_open, colour_close
   if colour == nil then
-    colour = span.attributes['colour']
-  end
-  if colour == nil then
-    colour = span.attributes['color']
+    colour_open = ''
+    colour_close = ''
+  else
+    colour_open = '#text(' .. colour .. ')['
+    colour_close = ']'
   end
 
-  local bg_colour = span.attributes['bg']
+  local bg_colour_open, bg_colour_close
   if bg_colour == nil then
-    bg_colour = span.attributes['bg-colour']
-  end
-  if bg_colour == nil then
-    bg_colour = span.attributes['bg-color']
+    bg_colour_open = ''
+    bg_colour_close = ''
+  else
+    bg_colour_open = '#block(fill: ' .. bg_colour .. ', inset: 0.5em, radius: 0.2em)['
+    bg_colour_close = ']'
   end
 
+  table.insert(
+    div.content, 1,
+    pandoc.RawBlock('typst', colour_open .. bg_colour_open)
+  )
+  table.insert(
+    div.content,
+    pandoc.RawBlock('typst', bg_colour_close .. colour_close)
+  )
+
+  return div.content
+end
+
+--- Extracts colour attributes from element attributes
+--- @param attributes table The element attributes
+--- @return string|nil colour The foreground colour
+--- @return string|nil bg_colour The background colour
+local function get_colour_attributes(attributes)
+  local colour = attributes['fg'] or attributes['colour'] or attributes['color']
+  local bg_colour = attributes['bg'] or attributes['bg-colour'] or attributes['bg-color']
+  return colour, bg_colour
+end
+
+--- Processes colour settings for light and dark themes
+--- @param colour string|nil The foreground colour
+--- @param bg_colour string|nil The background colour
+--- @return table|nil highlight_settings The processed highlight settings
+local function process_highlight_settings(colour, bg_colour)
   local highlight_settings = {}
+
   if quarto.brand.has_mode('light') or quarto.brand.has_mode('dark') then
     local modes = { 'light', 'dark' }
-
     for _, mode in ipairs(modes) do
       if quarto.brand.has_mode(mode) then
         highlight_settings[mode] = {
@@ -295,25 +449,37 @@ local function highlight(span)
   end
 
   if highlight_settings.light == nil and highlight_settings.dark == nil then
-    return span
+    return nil
   end
 
   if highlight_settings.light == nil then
     highlight_settings.light = highlight_settings.dark
   end
 
+  return highlight_settings
+end
+
+--- Main filter function that processes span elements and applies highlighting
+--- based on the output format and specified attributes
+--- @param span table The span element from the document
+--- @return table The modified span or span content with appropriate styling
+local function highlight(span)
+  local colour, bg_colour = get_colour_attributes(span.attributes)
+  local highlight_settings = process_highlight_settings(colour, bg_colour)
+
+  if highlight_settings == nil then
+    return span
+  end
+
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
 
-  if colour == nil and bg_colour == nil then return span end
-
-  local par
-  if span.attributes['par'] == nil then
-    par = false
-  else
-    par = true
-    span.attributes['par'] = nil
+  if colour == nil and bg_colour == nil then
+    return span
   end
+
+  local par = span.attributes['par'] ~= nil
+  span.attributes['par'] = nil
 
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return highlight_html(span, highlight_settings)
@@ -330,6 +496,49 @@ local function highlight(span)
   end
 end
 
+--- Main filter function that processes div elements and applies highlighting
+--- based on the output format and specified attributes
+--- @param div table The div element from the document
+--- @return table The modified div or div content with appropriate styling
+local function highlight_block(div)
+  local colour, bg_colour = get_colour_attributes(div.attributes)
+  local highlight_settings = process_highlight_settings(colour, bg_colour)
+
+  if highlight_settings == nil then
+    return div
+  end
+
+  colour = highlight_settings.light.colour
+  bg_colour = highlight_settings.light.bg_colour
+
+  if colour == nil and bg_colour == nil then
+    return div
+  end
+
+  -- Clean up attributes
+  div.attributes['fg'] = nil
+  div.attributes['colour'] = nil
+  div.attributes['color'] = nil
+  div.attributes['bg'] = nil
+  div.attributes['bg-colour'] = nil
+  div.attributes['bg-color'] = nil
+
+  if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
+    return highlight_html_block(div, highlight_settings)
+  elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
+    return highlight_latex_block(div, colour, bg_colour)
+  elseif quarto.doc.is_format('docx') then
+    return highlight_openxml_docx_block(div, colour, bg_colour)
+  elseif quarto.doc.is_format('pptx') then
+    return highlight_openxml_pptx_block(div, colour, bg_colour)
+  elseif quarto.doc.is_format('typst') then
+    return highlight_typst_block(div, colour, bg_colour)
+  else
+    return div
+  end
+end
+
 return {
   { Span = highlight },
+  { Div = highlight_block },
 }

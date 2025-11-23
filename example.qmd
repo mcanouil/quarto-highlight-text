@@ -18,6 +18,7 @@ format:
       y: 2.5cm
   pdf-xelatex:
     output-file: highlight-xelatex
+    pdf-engine: xelatex
     papersize: a4
     margin:
       x: 2.5cm
@@ -41,9 +42,11 @@ format:
   revealjs:
     output-file: highlight-revealjs
     embed-resources: true
+    smaller: true
   beamer:
     output-file: highlight-beamer
     aspectratio: 169
+    fontsize: 8pt
   pptx:
     output-file: highlight-pptx
 format-links:
@@ -111,6 +114,12 @@ The extension supports both British and American English spelling for colour att
 [Red]{colour="#b22222" bg-colour="#abc123"} # UK spelling
 [Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
 ```
+
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
 
 ### Shorter Syntax
 
@@ -185,6 +194,12 @@ Supported attributes:
   color="#ffffff" bg-color="#00ffff"
 }
 
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
+
 ### Using Brand Colours
 
 Define colours once in `_brand.yml` and reference them throughout your documents ([v1.1.0](../../releases/tag/1.1.0)):
@@ -205,10 +220,19 @@ Reference these colours directly by name:
 [Primary highlight]{bg="primary"}
 ```
 
-> [!NOTE]
-> The old `brand-color.` prefix syntax (e.g., `colour="brand-color.red"`) is deprecated but still supported ([v1.4.0](../../releases/tag/1.4.0)).
-> You'll see a warning when using it.
-> Use the colour name directly instead: `colour="red"`.
+:::: {.callout-note}
+
+The old `brand-color.` prefix syntax (e.g., `colour="brand-color.red"`) is deprecated but still supported ([v1.4.0](../../releases/tag/1.4.0)).
+You'll see a warning when using it.
+Use the colour name directly instead: `colour="red"`.
+
+:::
+
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
 
 ### Light and Dark Theme Support
 
@@ -230,6 +254,12 @@ brand:
         bg: "#ffffff"
 ```
 
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
+
 **Option 2**: Use external `_brand.yml` file:
 
 ```yaml
@@ -244,9 +274,12 @@ Then reference theme-aware colours:
 [This text adapts to theme]{fg="fg" bg="bg"}
 ```
 
-> [!NOTE]
-> Only HTML formats support dynamic light/dark mode switching.
-> Other formats will use the light mode colours if available, or fall back to dark mode colours otherwise, unless specified otherwise.
+:::: {.callout-note}
+
+Only HTML formats support dynamic light/dark mode switching.
+Other formats will use the light mode colours if available, or fall back to dark mode colours otherwise, unless specified otherwise.
+
+:::
 
 ## Brand Colours Examples
 
@@ -268,7 +301,71 @@ The old `brand-color.` prefix syntax still works but shows a deprecation warning
 
 [Using deprecated syntax]{colour="brand-color.fg" bg-colour="brand-color.bg"}
 
-> **Note**: Use the colour name directly without the `brand-color.` prefix (e.g., `fg="fg"` instead of `colour="brand-color.fg"`).
+:::: {.callout-note}
+
+Use the colour name directly without the `brand-color.` prefix (e.g., `fg="fg"` instead of `colour="brand-color.fg"`).
+
+:::
+
+## Block-Level Highlighting
+
+You can highlight entire blocks using div syntax.
+
+```markdown
+:::: {fg="#ffffff" bg="#0000ff"}
+
+This is a block-level highlighted section.
+It can contain multiple paragraphs, lists, and other block elements.
+
+- Item one.
+- Item two.
+
+All content within this div is highlighted.
+
+:::
+```
+
+:::: {fg="#ffffff" bg="#0000ff"}
+
+This is a block-level highlighted section.
+It can contain multiple paragraphs, lists, and other block elements.
+
+- Item one.
+- Item two.
+
+All content within this div is highlighted.
+
+:::
+
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
+
+### Block with Brand Colours
+
+```markdown
+:::: {fg="fg" bg="bg"}
+
+This block uses brand colours that adapt to light/dark themes.
+
+In light mode, this appears as white text on red background.
+
+In dark mode, this appears as red text on white background.
+
+:::
+```
+
+:::: {fg="fg" bg="bg"}
+
+This block uses brand colours that adapt to light/dark themes.
+
+In light mode, this appears as white text on red background.
+
+In dark mode, this appears as red text on white background.
+
+:::
 
 ## Limitations
 
@@ -277,11 +374,20 @@ The old `brand-color.` prefix syntax still works but shows a deprecation warning
 The LaTeX `\colorbox` command does not support line wrapping for highlighted text with background colours.
 Long highlighted text may overflow or break awkwardly.
 
-**Workaround for XeLaTeX and PDFLaTeX**: Use the `par=true` attribute to add `\parbox{\linewidth}`:
+**For inline highlighting**: Use the `par=true` attribute to add `\parbox{\linewidth}` (XeLaTeX and PDFLaTeX only):
 
 ```markdown
 [Long text with background]{colour="#b22222" bg-colour="#abc123" par=true}
 ```
+
+**For block-level highlighting**: Automatic line wrapping is enabled for all engines.
+Block divs automatically use `\parbox` for non-LuaLaTeX engines.
+
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
 
 **Best solution**: Use LuaLaTeX as your PDF engine for proper line wrapping with the `lua-ul` package:
 
@@ -292,10 +398,18 @@ format:
 ```
 
 :::: {.callout-note}
+
 LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
+
 :::
 
-**Example without workaround**:
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
+
+**Example without workaround (inline)**:
 
 ```markdown
 [Long text example without workaround]{colour="#b22222" bg-colour="#abc123"}
@@ -306,7 +420,13 @@ LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
 This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
 ]{colour="#b22222" bg-colour="#abc123"}
 
-**Example with `par=true`**:
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
+
+**Example with `par=true` (inline)**:
 
 ```markdown
 [Long text example with par=true]{colour="#b22222" bg-colour="#abc123" par=true}
@@ -316,6 +436,35 @@ This means that the above example will not work well in LaTeX output when using 
   LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
 This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
 ]{colour="#b22222" bg-colour="#abc123" par=true}
+
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
+
+**Example with block-level highlighting**:
+
+```markdown
+::: {colour="#b22222" bg-colour="#abc123"}
+LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+Block divs automatically handle line wrapping for all PDF engines.
+:::
+```
+
+:::: {colour="#b22222" bg-colour="#abc123"}
+
+LaTeX `\colorbox` command does not support wrapping/line breaks in the text to be highlighted.
+
+Block divs automatically handle line wrapping for all PDF engines, including XeLaTeX and PDFLaTeX.
+
+:::
+
+:::: {.content-visible when-format="beamer" when-format="revealjs"}
+
+---
+
+:::
 
 ### Word and PowerPoint Output
 
