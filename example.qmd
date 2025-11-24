@@ -145,7 +145,9 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 [Red text]{fg="#b22222"}
 [Red background]{bg="#abc123"}
 [White on Red]{fg="#ffffff" bg="#b22222"}
-[Text with border]{bc="#0000ff"}
+[Text with solid border]{bc="#0000ff"}
+[Text with dashed border]{bc="#b22222" bs="dashed"}
+[Text with dotted border]{bc="#00aa00" border-style="dotted"}
 ```
 
 Supported attributes:
@@ -153,6 +155,7 @@ Supported attributes:
 - **Foreground (text) colour**: `fg`, `colour`, or `color`
 - **Background colour**: `bg`, `bg-colour`, or `bg-color`
 - **Border colour**: `bc`, `border-colour`, or `border-color`
+- **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`)
 
 ## Font Colour
 
@@ -203,16 +206,28 @@ Supported attributes:
 ## Border Colour
 
 ```markdown
-[Text with border]{bc="#b22222"}
+[Text with solid border]{bc="#b22222"}
 ```
 
-[Text with border]{bc="#b22222"}
+[Text with solid border]{bc="#b22222"}
 
 ```markdown
-[Text with blue border]{border-colour="#0000ff"}
+[Text with dashed border]{bc="#0000ff" bs="dashed"}
 ```
 
-[Text with blue border]{border-colour="#0000ff"}
+[Text with dashed border]{bc="#0000ff" bs="dashed"}
+
+```markdown
+[Text with dotted border]{border-colour="#00aa00" border-style="dotted"}
+```
+
+[Text with dotted border]{border-colour="#00aa00" border-style="dotted"}
+
+```markdown
+[Text with double border]{bc="#8b008b" bs="double"}
+```
+
+[Text with double border]{bc="#8b008b" bs="double"}
 
 ## Border with Background Colour
 
@@ -394,18 +409,42 @@ All content within this div is highlighted.
 ```markdown
 :::: {bc="#b22222" bg="#ffffcc"}
 
-This block has a red border with a light yellow background.
-
-It can contain multiple paragraphs and lists.
+This block has a red solid border with a light yellow background.
 
 :::
 ```
 
 :::: {bc="#b22222" bg="#ffffcc"}
 
-This block has a red border with a light yellow background.
+This block has a red solid border with a light yellow background.
 
-It can contain multiple paragraphs and lists.
+:::
+
+```markdown
+:::: {bc="#0000ff" bg="#f0f0f0" bs="dashed"}
+
+This block has a blue dashed border with a light grey background.
+
+:::
+```
+
+:::: {bc="#0000ff" bg="#f0f0f0" bs="dashed"}
+
+This block has a blue dashed border with a light grey background.
+
+:::
+
+```markdown
+:::: {bc="#00aa00" bs="dotted"}
+
+This block has a green dotted border without background.
+
+:::
+```
+
+:::: {bc="#00aa00" bs="dotted"}
+
+This block has a green dotted border without background.
 
 :::
 

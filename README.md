@@ -52,7 +52,9 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 [Red text]{fg="#b22222"}
 [Red background]{bg="#abc123"}
 [White on Red]{fg="#ffffff" bg="#b22222"}
-[Text with border]{bc="#0000ff"}
+[Text with solid border]{bc="#0000ff"}
+[Text with dashed border]{bc="#b22222" bs="dashed"}
+[Text with dotted border]{bc="#00aa00" border-style="dotted"}
 ```
 
 For block-level highlighting:
@@ -63,7 +65,11 @@ Block with white text on red background.
 :::
 
 ::: {bc="#b22222" bg="#ffffcc"}
-Block with red border and light yellow background.
+Block with red solid border and light yellow background.
+:::
+
+::: {bc="#0000ff" bg="#f0f0f0" bs="dashed"}
+Block with blue dashed border and light grey background.
 :::
 ```
 
@@ -72,6 +78,7 @@ Supported attributes:
 - **Foreground (text) colour**: `fg`, `colour`, or `color`
 - **Background colour**: `bg`, `bg-colour`, or `bg-color`
 - **Border colour**: `bc`, `border-colour`, or `border-color`
+- **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`)
 
 ### Using Brand Colours
 

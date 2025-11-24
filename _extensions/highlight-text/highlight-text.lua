@@ -89,6 +89,7 @@ local function apply_html_styling(element, settings, is_block, constructor)
     local colour = settings[theme].colour
     local bg_colour = settings[theme].bg_colour
     local border_colour = settings[theme].border_colour
+    local border_style = settings[theme].border_style
 
     for k, v in pairs(element.attributes) do
       themed_element.attributes[k] = v
@@ -120,8 +121,11 @@ local function apply_html_styling(element, settings, is_block, constructor)
       themed_element.attributes['bc'] = nil
       themed_element.attributes['border-colour'] = nil
       themed_element.attributes['border-color'] = nil
+      themed_element.attributes['bs'] = nil
+      themed_element.attributes['border-style'] = nil
+      local style = border_style or 'solid'
       themed_element.attributes['style'] = themed_element.attributes['style'] ..
-          'border: 1px solid ' .. border_colour .. ';'
+          'border: 1px ' .. style .. ' ' .. border_colour .. ';'
     end
 
     table.insert(result, themed_element)
@@ -155,9 +159,10 @@ end
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
 --- @param border_colour string The border colour to apply
+--- @param border_style string The border style to apply
 --- @param par boolean Whether to wrap in a paragraph box
 --- @return table The span content with LaTeX markup
-local function highlight_latex(span, colour, bg_colour, border_colour, par)
+local function highlight_latex(span, colour, bg_colour, border_colour, border_style, par)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
 
   if is_lualatex and bg_colour ~= nil then
@@ -201,10 +206,20 @@ local function highlight_latex(span, colour, bg_colour, border_colour, par)
     border_open = ''
     border_close = ''
   else
+    -- Map border styles to TikZ line styles
+    local tikz_style = ''
+    if border_style == 'dashed' then
+      tikz_style = ', dashed'
+    elseif border_style == 'dotted' then
+      tikz_style = ', dotted'
+    elseif border_style == 'double' then
+      tikz_style = ', double'
+    end
+
     border_open = '\\tikz[baseline=(text.base)]{\\node[draw={rgb,255:red,' ..
-                  tonumber(border_colour:sub(2, 3), 16) .. ';green,' ..
-                  tonumber(border_colour:sub(4, 5), 16) .. ';blue,' ..
-                  tonumber(border_colour:sub(6, 7), 16) .. '}, inner sep=0.1em] (text) {\\strut '
+        tonumber(border_colour:sub(2, 3), 16) .. ';green,' ..
+        tonumber(border_colour:sub(4, 5), 16) .. ';blue,' ..
+        tonumber(border_colour:sub(6, 7), 16) .. '}' .. tikz_style .. ', inner sep=0.1em] (text) {\\strut '
     border_close = '};}'
   end
 
@@ -222,8 +237,9 @@ end
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
 --- @param border_colour string The border colour to apply
+--- @param border_style string The border style to apply
 --- @return table A modified div with LaTeX environment wrapping
-local function highlight_latex_block(div, colour, bg_colour, border_colour)
+local function highlight_latex_block(div, colour, bg_colour, border_colour, border_style)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
 
   if bg_colour ~= nil then
@@ -242,18 +258,33 @@ local function highlight_latex_block(div, colour, bg_colour, border_colour)
   local latex_end = ''
 
   if border_colour ~= nil then
+    -- Map border styles to TikZ line styles
+    local tikz_style = ''
+    if border_style == 'dashed' then
+      tikz_style = ', dashed'
+    elseif border_style == 'dotted' then
+      tikz_style = ', dotted'
+    elseif border_style == 'double' then
+      tikz_style = ', double'
+    end
+
     latex_begin = '\\begin{tikzpicture}\\node[draw={rgb,255:red,' ..
-                  tonumber(border_colour:sub(2, 3), 16) .. ';green,' ..
-                  tonumber(border_colour:sub(4, 5), 16) .. ';blue,' ..
-                  tonumber(border_colour:sub(6, 7), 16) .. '}, inner sep=0.5em, text width=\\dimexpr\\linewidth-1em\\relax]{'
+        tonumber(border_colour:sub(2, 3), 16) .. ';green,' ..
+        tonumber(border_colour:sub(4, 5), 16) .. ';blue,' ..
+        tonumber(border_colour:sub(6, 7), 16) ..
+        '}' .. tikz_style .. ', inner sep=0.5em, text width=\\dimexpr\\linewidth-1em\\relax]{'
     latex_end = '};\\end{tikzpicture}'
 
     if colour ~= nil and bg_colour ~= nil then
       if is_lualatex then
-        latex_begin = latex_begin .. '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
+        latex_begin = latex_begin ..
+            '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
         latex_end = '}}' .. latex_end
       else
-        latex_begin = latex_begin .. '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2em}{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
+        latex_begin = latex_begin ..
+            '\\colorbox[HTML]{' ..
+            bg_colour:gsub('^#', '') ..
+            '}{\\parbox{\\dimexpr\\linewidth-2em}{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
         latex_end = '}}' .. latex_end
       end
     elseif bg_colour ~= nil then
@@ -261,7 +292,8 @@ local function highlight_latex_block(div, colour, bg_colour, border_colour)
         latex_begin = latex_begin .. '\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
         latex_end = '}' .. latex_end
       else
-        latex_begin = latex_begin .. '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2em}{'
+        latex_begin = latex_begin ..
+            '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2em}{'
         latex_end = '}}' .. latex_end
       end
     elseif colour ~= nil then
@@ -270,10 +302,13 @@ local function highlight_latex_block(div, colour, bg_colour, border_colour)
     end
   elseif colour ~= nil and bg_colour ~= nil then
     if is_lualatex then
-      latex_begin = '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
+      latex_begin = '{\\color[HTML]{' ..
+          colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
       latex_end = '}}'
     else
-      latex_begin = '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
+      latex_begin = '\\colorbox[HTML]{' ..
+          bg_colour:gsub('^#', '') ..
+          '}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
       latex_end = '}}'
     end
   elseif bg_colour ~= nil then
@@ -300,8 +335,9 @@ end
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
 --- @param border_colour string The border colour to apply
+--- @param border_style string The border style to apply
 --- @return table The span content with OpenXML markup for Word
-local function highlight_openxml_docx(span, colour, bg_colour, border_colour)
+local function highlight_openxml_docx(span, colour, bg_colour, border_colour, border_style)
   local spec = '<w:r><w:rPr>'
   if bg_colour ~= nil then
     spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub('^#', '') .. '"/>'
@@ -310,7 +346,17 @@ local function highlight_openxml_docx(span, colour, bg_colour, border_colour)
     spec = spec .. '<w:color w:val="' .. colour:gsub('^#', '') .. '"/>'
   end
   if border_colour ~= nil then
-    spec = spec .. '<w:bdr w:val="single" w:sz="4" w:space="0" w:color="' .. border_colour:gsub('^#', '') .. '"/>'
+    -- Map border styles to Word border values
+    local word_style = 'single'
+    if border_style == 'dashed' then
+      word_style = 'dashed'
+    elseif border_style == 'dotted' then
+      word_style = 'dotted'
+    elseif border_style == 'double' then
+      word_style = 'double'
+    end
+    spec = spec ..
+        '<w:bdr w:val="' .. word_style .. '" w:sz="4" w:space="0" w:color="' .. border_colour:gsub('^#', '') .. '"/>'
   end
   spec = spec .. '</w:rPr><w:t>'
 
@@ -325,17 +371,30 @@ end
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
 --- @param border_colour string The border colour to apply
+--- @param border_style string The border style to apply
 --- @return table The div content with OpenXML markup for Word
-local function highlight_openxml_docx_block(div, colour, bg_colour, border_colour)
+local function highlight_openxml_docx_block(div, colour, bg_colour, border_colour, border_style)
   local spec = '<w:pPr>'
   if bg_colour ~= nil then
     spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub('^#', '') .. '"/>'
   end
   if border_colour ~= nil then
-    local border_spec = '<w:pBdr><w:top w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
-                       '<w:left w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
-                       '<w:bottom w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
-                       '<w:right w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/></w:pBdr>'
+    -- Map border styles to Word border values
+    local word_style = 'single'
+    if border_style == 'dashed' then
+      word_style = 'dashed'
+    elseif border_style == 'dotted' then
+      word_style = 'dotted'
+    elseif border_style == 'double' then
+      word_style = 'double'
+    end
+    local border_spec = '<w:pBdr><w:top w:val="' ..
+        word_style .. '" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
+        '<w:left w:val="' .. word_style .. '" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
+        '<w:bottom w:val="' ..
+        word_style .. '" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
+        '<w:right w:val="' ..
+        word_style .. '" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/></w:pBdr>'
     spec = spec .. border_spec
   end
   spec = spec .. '</w:pPr>'
@@ -422,8 +481,9 @@ end
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
 --- @param border_colour string The border colour to apply
+--- @param border_style string The border style to apply
 --- @return table The span content with Typst markup
-local function highlight_typst(span, colour, bg_colour, border_colour)
+local function highlight_typst(span, colour, bg_colour, border_colour, border_style)
   local colour_open, colour_close
   if colour == nil then
     colour_open = ''
@@ -436,14 +496,29 @@ local function highlight_typst(span, colour, bg_colour, border_colour)
   local bg_colour_open, bg_colour_close
   local border_open, border_close
 
+  -- Build Typst stroke specification with optional dash pattern
+  local function build_stroke(stroke_colour, style)
+    if style == 'dashed' then
+      return '(paint: ' .. stroke_colour .. ', dash: "dashed")'
+    elseif style == 'dotted' then
+      return '(paint: ' .. stroke_colour .. ', dash: "dotted")'
+    elseif style == 'double' then
+      return '(paint: ' .. stroke_colour .. ', thickness: 2pt)'
+    else
+      return stroke_colour
+    end
+  end
+
   -- When both border and background are present, combine them in a single box
   if border_colour ~= nil and bg_colour ~= nil then
-    border_open = '#box(stroke: ' .. border_colour .. ', fill: ' .. bg_colour .. ', inset: (x: 0.2em, y: 0.45em))['
+    local stroke_spec = build_stroke(border_colour, border_style)
+    border_open = '#box(stroke: ' .. stroke_spec .. ', fill: ' .. bg_colour .. ', inset: (x: 0.2em, y: 0.45em))['
     border_close = ']'
     bg_colour_open = ''
     bg_colour_close = ''
   elseif border_colour ~= nil then
-    border_open = '#box(stroke: ' .. border_colour .. ', inset: (x: 0.2em, y: 0.45em))['
+    local stroke_spec = build_stroke(border_colour, border_style)
+    border_open = '#box(stroke: ' .. stroke_spec .. ', inset: (x: 0.2em, y: 0.45em))['
     border_close = ']'
     bg_colour_open = ''
     bg_colour_close = ''
@@ -476,8 +551,9 @@ end
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
 --- @param border_colour string The border colour to apply
+--- @param border_style string The border style to apply
 --- @return table The div content with Typst markup
-local function highlight_typst_block(div, colour, bg_colour, border_colour)
+local function highlight_typst_block(div, colour, bg_colour, border_colour, border_style)
   local colour_open, colour_close
   if colour == nil then
     colour_open = ''
@@ -490,14 +566,30 @@ local function highlight_typst_block(div, colour, bg_colour, border_colour)
   local bg_colour_open, bg_colour_close
   local border_open, border_close
 
+  -- Build Typst stroke specification with optional dash pattern
+  local function build_stroke(stroke_colour, style)
+    if style == 'dashed' then
+      return '(paint: ' .. stroke_colour .. ', dash: "dashed")'
+    elseif style == 'dotted' then
+      return '(paint: ' .. stroke_colour .. ', dash: "dotted")'
+    elseif style == 'double' then
+      return '(paint: ' .. stroke_colour .. ', thickness: 2pt)'
+    else
+      return stroke_colour
+    end
+  end
+
   -- When both border and background are present, combine them in a single block
   if border_colour ~= nil and bg_colour ~= nil then
-    border_open = '#block(stroke: ' .. border_colour .. ', fill: ' .. bg_colour .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
+    local stroke_spec = build_stroke(border_colour, border_style)
+    border_open = '#block(stroke: ' ..
+        stroke_spec .. ', fill: ' .. bg_colour .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
     border_close = ']'
     bg_colour_open = ''
     bg_colour_close = ''
   elseif border_colour ~= nil then
-    border_open = '#block(stroke: ' .. border_colour .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
+    local stroke_spec = build_stroke(border_colour, border_style)
+    border_open = '#block(stroke: ' .. stroke_spec .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
     border_close = ']'
     bg_colour_open = ''
     bg_colour_close = ''
@@ -530,19 +622,22 @@ end
 --- @return string|nil colour The foreground colour
 --- @return string|nil bg_colour The background colour
 --- @return string|nil border_colour The border colour
+--- @return string|nil border_style The border style
 local function get_colour_attributes(attributes)
   local colour = attributes['fg'] or attributes['colour'] or attributes['color']
   local bg_colour = attributes['bg'] or attributes['bg-colour'] or attributes['bg-color']
   local border_colour = attributes['bc'] or attributes['border-colour'] or attributes['border-color']
-  return colour, bg_colour, border_colour
+  local border_style = attributes['bs'] or attributes['border-style']
+  return colour, bg_colour, border_colour, border_style
 end
 
 --- Processes colour settings for light and dark themes
 --- @param colour string|nil The foreground colour
 --- @param bg_colour string|nil The background colour
 --- @param border_colour string|nil The border colour
+--- @param border_style string|nil The border style
 --- @return table|nil highlight_settings The processed highlight settings
-local function process_highlight_settings(colour, bg_colour, border_colour)
+local function process_highlight_settings(colour, bg_colour, border_colour, border_style)
   local highlight_settings = {}
 
   if quarto.brand.has_mode('light') or quarto.brand.has_mode('dark') then
@@ -552,7 +647,8 @@ local function process_highlight_settings(colour, bg_colour, border_colour)
         highlight_settings[mode] = {
           colour = get_brand_colour(mode, colour),
           bg_colour = get_brand_colour(mode, bg_colour),
-          border_colour = get_brand_colour(mode, border_colour)
+          border_colour = get_brand_colour(mode, border_colour),
+          border_style = border_style
         }
       end
     end
@@ -560,7 +656,8 @@ local function process_highlight_settings(colour, bg_colour, border_colour)
     highlight_settings.light = {
       colour = get_brand_colour('light', colour),
       bg_colour = get_brand_colour('light', bg_colour),
-      border_colour = get_brand_colour('light', border_colour)
+      border_colour = get_brand_colour('light', border_colour),
+      border_style = border_style
     }
   end
 
@@ -580,8 +677,8 @@ end
 --- @param span table The span element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
-  local colour, bg_colour, border_colour = get_colour_attributes(span.attributes)
-  local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour)
+  local colour, bg_colour, border_colour, border_style = get_colour_attributes(span.attributes)
+  local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style)
 
   if highlight_settings == nil then
     return span
@@ -590,6 +687,7 @@ local function highlight(span)
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
   border_colour = highlight_settings.light.border_colour
+  border_style = highlight_settings.light.border_style
 
   if colour == nil and bg_colour == nil and border_colour == nil then
     return span
@@ -601,13 +699,13 @@ local function highlight(span)
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return highlight_html(span, highlight_settings)
   elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
-    return highlight_latex(span, colour, bg_colour, border_colour, par)
+    return highlight_latex(span, colour, bg_colour, border_colour, border_style, par)
   elseif quarto.doc.is_format('docx') then
-    return highlight_openxml_docx(span, colour, bg_colour, border_colour)
+    return highlight_openxml_docx(span, colour, bg_colour, border_colour, border_style)
   elseif quarto.doc.is_format('pptx') then
     return highlight_openxml_pptx(span, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('typst') then
-    return highlight_typst(span, colour, bg_colour, border_colour)
+    return highlight_typst(span, colour, bg_colour, border_colour, border_style)
   else
     return span
   end
@@ -618,8 +716,8 @@ end
 --- @param div table The div element from the document
 --- @return table The modified div or div content with appropriate styling
 local function highlight_block(div)
-  local colour, bg_colour, border_colour = get_colour_attributes(div.attributes)
-  local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour)
+  local colour, bg_colour, border_colour, border_style = get_colour_attributes(div.attributes)
+  local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style)
 
   if highlight_settings == nil then
     return div
@@ -628,6 +726,7 @@ local function highlight_block(div)
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
   border_colour = highlight_settings.light.border_colour
+  border_style = highlight_settings.light.border_style
 
   if colour == nil and bg_colour == nil and border_colour == nil then
     return div
@@ -643,17 +742,19 @@ local function highlight_block(div)
   div.attributes['bc'] = nil
   div.attributes['border-colour'] = nil
   div.attributes['border-color'] = nil
+  div.attributes['bs'] = nil
+  div.attributes['border-style'] = nil
 
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return highlight_html_block(div, highlight_settings)
   elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
-    return highlight_latex_block(div, colour, bg_colour, border_colour)
+    return highlight_latex_block(div, colour, bg_colour, border_colour, border_style)
   elseif quarto.doc.is_format('docx') then
-    return highlight_openxml_docx_block(div, colour, bg_colour, border_colour)
+    return highlight_openxml_docx_block(div, colour, bg_colour, border_colour, border_style)
   elseif quarto.doc.is_format('pptx') then
     return highlight_openxml_pptx_block(div, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('typst') then
-    return highlight_typst_block(div, colour, bg_colour, border_colour)
+    return highlight_typst_block(div, colour, bg_colour, border_colour, border_style)
   else
     return div
   end
