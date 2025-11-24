@@ -21,15 +21,27 @@ filters:
   - highlight-text
 ```
 
-Then you can use the span syntax markup to highlight text in your document.
+Then you can use either span syntax for inline highlighting or div syntax for block-level highlighting.
 
-### Basic Syntax
+### Inline Highlighting (Spans)
 
-The extension supports both British and American English spelling for colour attributes:
+Highlight text inline using span syntax:
 
 ```markdown
 [Red]{colour="#b22222" bg-colour="#abc123"} # UK spelling
 [Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
+```
+
+### Block Highlighting (Divs)
+
+Highlight entire blocks using div syntax:
+
+```markdown
+::: {fg="#ffffff" bg="#0000ff"}
+This is a block-level highlighted section.
+
+It can contain multiple paragraphs, lists, and other content.
+:::
 ```
 
 ### Shorter Syntax
@@ -40,6 +52,14 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 [Red text]{fg="#b22222"}
 [Red background]{bg="#abc123"}
 [White on Red]{fg="#ffffff" bg="#b22222"}
+```
+
+For block-level highlighting:
+
+```markdown
+::: {fg="#ffffff" bg="#b22222"}
+Block with white text on red background.
+:::
 ```
 
 Supported attributes:
@@ -117,11 +137,14 @@ Then reference theme-aware colours:
 The LaTeX `\colorbox` command does not support line wrapping for highlighted text with background colours.
 Long highlighted text may overflow or break awkwardly.
 
-**Workaround for XeLaTeX and PDFLaTeX**: Use the `par=true` attribute to add `\parbox{\linewidth}`:
+**For inline highlighting**: Use the `par=true` attribute to add `\parbox{\linewidth}` (XeLaTeX and PDFLaTeX only):
 
 ```markdown
 [Long text with background]{colour="#b22222" bg-colour="#abc123" par=true}
 ```
+
+**For block-level highlighting**: Automatic line wrapping is enabled for all engines.
+Block divs automatically use `\parbox` for non-LuaLaTeX engines.
 
 **Best solution**: Use LuaLaTeX as your PDF engine for proper line wrapping with the `lua-ul` package:
 
