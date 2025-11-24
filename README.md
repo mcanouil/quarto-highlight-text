@@ -52,6 +52,7 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 [Red text]{fg="#b22222"}
 [Red background]{bg="#abc123"}
 [White on Red]{fg="#ffffff" bg="#b22222"}
+[Text with border]{bc="#0000ff"}
 ```
 
 For block-level highlighting:
@@ -60,12 +61,17 @@ For block-level highlighting:
 ::: {fg="#ffffff" bg="#b22222"}
 Block with white text on red background.
 :::
+
+::: {bc="#b22222" bg="#ffffcc"}
+Block with red border and light yellow background.
+:::
 ```
 
 Supported attributes:
 
 - **Foreground (text) colour**: `fg`, `colour`, or `color`
 - **Background colour**: `bg`, `bg-colour`, or `bg-color`
+- **Border colour**: `bc`, `border-colour`, or `border-color`
 
 ### Using Brand Colours
 
@@ -157,11 +163,9 @@ format:
 > [!NOTE]
 > LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
 
-### Word and PowerPoint Output
+### PowerPoint Output
 
-Docx and Pptx formats only support highlighting plain text.
-
-Links and other inline formatting within highlighted spans may not render correctly.
+Border colour is not supported in PowerPoint output.
 
 ## Example
 

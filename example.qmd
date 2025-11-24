@@ -131,7 +131,7 @@ The extension supports both British and American English spelling for colour att
 [Blue]{color="#0000ff" bg-color="#abc123"} # US spelling
 ```
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -145,12 +145,14 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 [Red text]{fg="#b22222"}
 [Red background]{bg="#abc123"}
 [White on Red]{fg="#ffffff" bg="#b22222"}
+[Text with border]{bc="#0000ff"}
 ```
 
 Supported attributes:
 
 - **Foreground (text) colour**: `fg`, `colour`, or `color`
 - **Background colour**: `bg`, `bg-colour`, or `bg-color`
+- **Border colour**: `bc`, `border-colour`, or `border-color`
 
 ## Font Colour
 
@@ -198,6 +200,34 @@ Supported attributes:
 
 [White text, Blue background]{colour="#ffffff" bg-colour="#0000ff"}
 
+## Border Colour
+
+```markdown
+[Text with border]{bc="#b22222"}
+```
+
+[Text with border]{bc="#b22222"}
+
+```markdown
+[Text with blue border]{border-colour="#0000ff"}
+```
+
+[Text with blue border]{border-colour="#0000ff"}
+
+## Border with Background Colour
+
+```markdown
+[Red border, yellow background]{bc="#b22222" bg="#ffff00"}
+```
+
+[Red border, yellow background]{bc="#b22222" bg="#ffff00"}
+
+```markdown
+[Blue border, white on red]{bc="#0000ff" fg="#ffffff" bg="#b22222"}
+```
+
+[Blue border, white on red]{bc="#0000ff" fg="#ffffff" bg="#b22222"}
+
 ## More Examples
 
 ```markdown
@@ -210,7 +240,7 @@ Supported attributes:
   color="#ffffff" bg-color="#00ffff"
 }
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -244,7 +274,7 @@ Use the colour name directly instead: `colour="red"`.
 
 :::
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -270,7 +300,7 @@ brand:
         bg: "#ffffff"
 ```
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -353,7 +383,33 @@ All content within this div is highlighted.
 
 :::
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
+
+---
+
+:::
+
+### Block with Border
+
+```markdown
+:::: {bc="#b22222" bg="#ffffcc"}
+
+This block has a red border with a light yellow background.
+
+It can contain multiple paragraphs and lists.
+
+:::
+```
+
+:::: {bc="#b22222" bg="#ffffcc"}
+
+This block has a red border with a light yellow background.
+
+It can contain multiple paragraphs and lists.
+
+:::
+
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -399,7 +455,7 @@ Long highlighted text may overflow or break awkwardly.
 **For block-level highlighting**: Automatic line wrapping is enabled for all engines.
 Block divs automatically use `\parbox` for non-LuaLaTeX engines.
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -419,7 +475,7 @@ LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
 
 :::
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -436,7 +492,7 @@ LuaLaTeX is the default PDF engine in Quarto CLI ≥1.8.25.
 This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
 ]{colour="#b22222" bg-colour="#abc123"}
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -453,7 +509,7 @@ This means that the above example will not work well in LaTeX output when using 
 This means that the above example will not work well in LaTeX output when using XeLaTeX or PDFLaTeX engines.
 ]{colour="#b22222" bg-colour="#abc123" par=true}
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
@@ -476,14 +532,12 @@ Block divs automatically handle line wrapping for all PDF engines, including XeL
 
 :::
 
-:::: {.content-visible when-format="beamer" when-format="revealjs"}
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
 
 ---
 
 :::
 
-### Word and PowerPoint Output
+### PowerPoint Output
 
-Docx and Pptx formats only support highlighting plain text.
-
-Links and other inline formatting within highlighted spans may not render correctly.
+Border colour is not supported in PowerPoint output.

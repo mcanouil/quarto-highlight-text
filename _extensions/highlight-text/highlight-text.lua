@@ -88,6 +88,7 @@ local function apply_html_styling(element, settings, is_block, constructor)
     local themed_element = constructor(element.content)
     local colour = settings[theme].colour
     local bg_colour = settings[theme].bg_colour
+    local border_colour = settings[theme].border_colour
 
     for k, v in pairs(element.attributes) do
       themed_element.attributes[k] = v
@@ -113,6 +114,14 @@ local function apply_html_styling(element, settings, is_block, constructor)
       themed_element.attributes['bg-color'] = nil
       themed_element.attributes['style'] = themed_element.attributes['style'] ..
           'border-radius: 0.2rem; padding: ' .. padding .. ';' .. 'background-color: ' .. bg_colour .. ';'
+    end
+
+    if border_colour ~= nil then
+      themed_element.attributes['bc'] = nil
+      themed_element.attributes['border-colour'] = nil
+      themed_element.attributes['border-color'] = nil
+      themed_element.attributes['style'] = themed_element.attributes['style'] ..
+          'border: 1px solid ' .. border_colour .. ';'
     end
 
     table.insert(result, themed_element)
@@ -145,13 +154,18 @@ end
 --- @param span table The span element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply
 --- @param par boolean Whether to wrap in a paragraph box
 --- @return table The span content with LaTeX markup
-local function highlight_latex(span, colour, bg_colour, par)
+local function highlight_latex(span, colour, bg_colour, border_colour, par)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
 
   if is_lualatex and bg_colour ~= nil then
     quarto.doc.use_latex_package('luacolor, lua-ul')
+  end
+
+  if border_colour ~= nil then
+    quarto.doc.use_latex_package('tikz')
   end
 
   local colour_open, colour_close
@@ -182,11 +196,23 @@ local function highlight_latex(span, colour, bg_colour, par)
     bg_colour_close = '}' .. bg_colour_close
   end
 
+  local border_open, border_close
+  if border_colour == nil then
+    border_open = ''
+    border_close = ''
+  else
+    border_open = '\\tikz[baseline=(text.base)]{\\node[draw={rgb,255:red,' ..
+                  tonumber(border_colour:sub(2, 3), 16) .. ';green,' ..
+                  tonumber(border_colour:sub(4, 5), 16) .. ';blue,' ..
+                  tonumber(border_colour:sub(6, 7), 16) .. '}, inner sep=0.1em] (text) {\\strut '
+    border_close = '};}'
+  end
+
   table.insert(
     span.content, 1,
-    pandoc.RawInline('latex', colour_open .. bg_colour_open)
+    pandoc.RawInline('latex', border_open .. colour_open .. bg_colour_open)
   )
-  table.insert(span.content, pandoc.RawInline('latex', bg_colour_close .. colour_close))
+  table.insert(span.content, pandoc.RawInline('latex', bg_colour_close .. colour_close .. border_close))
 
   return span.content
 end
@@ -195,8 +221,9 @@ end
 --- @param div table The div element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply
 --- @return table A modified div with LaTeX environment wrapping
-local function highlight_latex_block(div, colour, bg_colour)
+local function highlight_latex_block(div, colour, bg_colour, border_colour)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
 
   if bg_colour ~= nil then
@@ -207,10 +234,41 @@ local function highlight_latex_block(div, colour, bg_colour)
     end
   end
 
+  if border_colour ~= nil then
+    quarto.doc.use_latex_package('tikz')
+  end
+
   local latex_begin = ''
   local latex_end = ''
 
-  if colour ~= nil and bg_colour ~= nil then
+  if border_colour ~= nil then
+    latex_begin = '\\begin{tikzpicture}\\node[draw={rgb,255:red,' ..
+                  tonumber(border_colour:sub(2, 3), 16) .. ';green,' ..
+                  tonumber(border_colour:sub(4, 5), 16) .. ';blue,' ..
+                  tonumber(border_colour:sub(6, 7), 16) .. '}, inner sep=0.5em, text width=\\dimexpr\\linewidth-1em\\relax]{'
+    latex_end = '};\\end{tikzpicture}'
+
+    if colour ~= nil and bg_colour ~= nil then
+      if is_lualatex then
+        latex_begin = latex_begin .. '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
+        latex_end = '}}' .. latex_end
+      else
+        latex_begin = latex_begin .. '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2em}{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
+        latex_end = '}}' .. latex_end
+      end
+    elseif bg_colour ~= nil then
+      if is_lualatex then
+        latex_begin = latex_begin .. '\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
+        latex_end = '}' .. latex_end
+      else
+        latex_begin = latex_begin .. '\\colorbox[HTML]{' .. bg_colour:gsub('^#', '') .. '}{\\parbox{\\dimexpr\\linewidth-2em}{'
+        latex_end = '}}' .. latex_end
+      end
+    elseif colour ~= nil then
+      latex_begin = latex_begin .. '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}'
+      latex_end = '}' .. latex_end
+    end
+  elseif colour ~= nil and bg_colour ~= nil then
     if is_lualatex then
       latex_begin = '{\\color[HTML]{' .. colour:gsub('^#', '') .. '}\\highLight[{[HTML]{' .. bg_colour:gsub('^#', '') .. '}}]{'
       latex_end = '}}'
@@ -241,14 +299,18 @@ end
 --- @param span table The span element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply
 --- @return table The span content with OpenXML markup for Word
-local function highlight_openxml_docx(span, colour, bg_colour)
+local function highlight_openxml_docx(span, colour, bg_colour, border_colour)
   local spec = '<w:r><w:rPr>'
   if bg_colour ~= nil then
     spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub('^#', '') .. '"/>'
   end
   if colour ~= nil then
     spec = spec .. '<w:color w:val="' .. colour:gsub('^#', '') .. '"/>'
+  end
+  if border_colour ~= nil then
+    spec = spec .. '<w:bdr w:val="single" w:sz="4" w:space="0" w:color="' .. border_colour:gsub('^#', '') .. '"/>'
   end
   spec = spec .. '</w:rPr><w:t>'
 
@@ -262,11 +324,19 @@ end
 --- @param div table The div element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply
 --- @return table The div content with OpenXML markup for Word
-local function highlight_openxml_docx_block(div, colour, bg_colour)
+local function highlight_openxml_docx_block(div, colour, bg_colour, border_colour)
   local spec = '<w:pPr>'
   if bg_colour ~= nil then
     spec = spec .. '<w:shd w:val="clear" w:fill="' .. bg_colour:gsub('^#', '') .. '"/>'
+  end
+  if border_colour ~= nil then
+    local border_spec = '<w:pBdr><w:top w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
+                       '<w:left w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
+                       '<w:bottom w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/>' ..
+                       '<w:right w:val="single" w:sz="4" w:space="1" w:color="' .. border_colour:gsub('^#', '') .. '"/></w:pBdr>'
+    spec = spec .. border_spec
   end
   spec = spec .. '</w:pPr>'
 
@@ -290,8 +360,12 @@ end
 --- @param span table The span element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply (not supported for inline text)
 --- @return table Raw inline containing OpenXML markup for PowerPoint
-local function highlight_openxml_pptx(span, colour, bg_colour)
+local function highlight_openxml_pptx(span, colour, bg_colour, border_colour)
+  -- Note: PowerPoint does not support rectangular borders on inline text runs
+  -- Border colour is ignored for inline spans in PowerPoint format
+  -- Use block-level divs for border support
   local spec = '<a:r><a:rPr dirty="0">'
   if colour ~= nil then
     spec = spec .. '<a:solidFill><a:srgbClr val="' .. colour:gsub('^#', '') .. '" /></a:solidFill>'
@@ -301,11 +375,8 @@ local function highlight_openxml_pptx(span, colour, bg_colour)
   end
   spec = spec .. '</a:rPr><a:t>'
 
-  -- table.insert(span.content, 1, pandoc.RawInline('openxml', spec))
-  -- table.insert(span.content, pandoc.RawInline('openxml', '</a:t></a:r>'))
-
   local span_content_string = ''
-  for i, inline in ipairs(span.content) do
+  for _, inline in ipairs(span.content) do
     span_content_string = span_content_string .. pandoc.utils.stringify(inline)
   end
 
@@ -316,8 +387,12 @@ end
 --- @param div table The div element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply (not supported)
 --- @return table The div content with OpenXML markup for PowerPoint
-local function highlight_openxml_pptx_block(div, colour, bg_colour)
+local function highlight_openxml_pptx_block(div, colour, bg_colour, border_colour)
+  -- Note: PowerPoint does not support rectangular borders on text paragraphs
+  -- Border colour is ignored for PowerPoint format
+  -- Borders in PowerPoint can only be applied to shapes or table cells
   for idx = 1, #div.content do
     if div.content[idx].t == 'Para' or div.content[idx].t == 'Plain' then
       local para = div.content[idx]
@@ -346,8 +421,9 @@ end
 --- @param span table The span element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply
 --- @return table The span content with Typst markup
-local function highlight_typst(span, colour, bg_colour)
+local function highlight_typst(span, colour, bg_colour, border_colour)
   local colour_open, colour_close
   if colour == nil then
     colour_open = ''
@@ -358,21 +434,38 @@ local function highlight_typst(span, colour, bg_colour)
   end
 
   local bg_colour_open, bg_colour_close
-  if bg_colour == nil then
+  local border_open, border_close
+
+  -- When both border and background are present, combine them in a single box
+  if border_colour ~= nil and bg_colour ~= nil then
+    border_open = '#box(stroke: ' .. border_colour .. ', fill: ' .. bg_colour .. ', inset: (x: 0.2em, y: 0.45em))['
+    border_close = ']'
     bg_colour_open = ''
     bg_colour_close = ''
-  else
+  elseif border_colour ~= nil then
+    border_open = '#box(stroke: ' .. border_colour .. ', inset: (x: 0.2em, y: 0.45em))['
+    border_close = ']'
+    bg_colour_open = ''
+    bg_colour_close = ''
+  elseif bg_colour ~= nil then
     bg_colour_open = '#highlight(fill: ' .. bg_colour .. ')['
     bg_colour_close = ']'
+    border_open = ''
+    border_close = ''
+  else
+    bg_colour_open = ''
+    bg_colour_close = ''
+    border_open = ''
+    border_close = ''
   end
 
   table.insert(
     span.content, 1,
-    pandoc.RawInline('typst', colour_open .. bg_colour_open)
+    pandoc.RawInline('typst', border_open .. colour_open .. bg_colour_open)
   )
   table.insert(
     span.content,
-    pandoc.RawInline('typst', bg_colour_close .. colour_close)
+    pandoc.RawInline('typst', bg_colour_close .. colour_close .. border_close)
   )
 
   return span.content
@@ -382,8 +475,9 @@ end
 --- @param div table The div element to modify
 --- @param colour string The text colour to apply
 --- @param bg_colour string The background colour to apply
+--- @param border_colour string The border colour to apply
 --- @return table The div content with Typst markup
-local function highlight_typst_block(div, colour, bg_colour)
+local function highlight_typst_block(div, colour, bg_colour, border_colour)
   local colour_open, colour_close
   if colour == nil then
     colour_open = ''
@@ -394,21 +488,38 @@ local function highlight_typst_block(div, colour, bg_colour)
   end
 
   local bg_colour_open, bg_colour_close
-  if bg_colour == nil then
+  local border_open, border_close
+
+  -- When both border and background are present, combine them in a single block
+  if border_colour ~= nil and bg_colour ~= nil then
+    border_open = '#block(stroke: ' .. border_colour .. ', fill: ' .. bg_colour .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
+    border_close = ']'
     bg_colour_open = ''
     bg_colour_close = ''
-  else
+  elseif border_colour ~= nil then
+    border_open = '#block(stroke: ' .. border_colour .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
+    border_close = ']'
+    bg_colour_open = ''
+    bg_colour_close = ''
+  elseif bg_colour ~= nil then
     bg_colour_open = '#block(fill: ' .. bg_colour .. ', inset: 0.5em, radius: 0.2em)['
     bg_colour_close = ']'
+    border_open = ''
+    border_close = ''
+  else
+    bg_colour_open = ''
+    bg_colour_close = ''
+    border_open = ''
+    border_close = ''
   end
 
   table.insert(
     div.content, 1,
-    pandoc.RawBlock('typst', colour_open .. bg_colour_open)
+    pandoc.RawBlock('typst', border_open .. colour_open .. bg_colour_open)
   )
   table.insert(
     div.content,
-    pandoc.RawBlock('typst', bg_colour_close .. colour_close)
+    pandoc.RawBlock('typst', bg_colour_close .. colour_close .. border_close)
   )
 
   return div.content
@@ -418,17 +529,20 @@ end
 --- @param attributes table The element attributes
 --- @return string|nil colour The foreground colour
 --- @return string|nil bg_colour The background colour
+--- @return string|nil border_colour The border colour
 local function get_colour_attributes(attributes)
   local colour = attributes['fg'] or attributes['colour'] or attributes['color']
   local bg_colour = attributes['bg'] or attributes['bg-colour'] or attributes['bg-color']
-  return colour, bg_colour
+  local border_colour = attributes['bc'] or attributes['border-colour'] or attributes['border-color']
+  return colour, bg_colour, border_colour
 end
 
 --- Processes colour settings for light and dark themes
 --- @param colour string|nil The foreground colour
 --- @param bg_colour string|nil The background colour
+--- @param border_colour string|nil The border colour
 --- @return table|nil highlight_settings The processed highlight settings
-local function process_highlight_settings(colour, bg_colour)
+local function process_highlight_settings(colour, bg_colour, border_colour)
   local highlight_settings = {}
 
   if quarto.brand.has_mode('light') or quarto.brand.has_mode('dark') then
@@ -437,14 +551,16 @@ local function process_highlight_settings(colour, bg_colour)
       if quarto.brand.has_mode(mode) then
         highlight_settings[mode] = {
           colour = get_brand_colour(mode, colour),
-          bg_colour = get_brand_colour(mode, bg_colour)
+          bg_colour = get_brand_colour(mode, bg_colour),
+          border_colour = get_brand_colour(mode, border_colour)
         }
       end
     end
   else
     highlight_settings.light = {
       colour = get_brand_colour('light', colour),
-      bg_colour = get_brand_colour('light', bg_colour)
+      bg_colour = get_brand_colour('light', bg_colour),
+      border_colour = get_brand_colour('light', border_colour)
     }
   end
 
@@ -464,8 +580,8 @@ end
 --- @param span table The span element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
-  local colour, bg_colour = get_colour_attributes(span.attributes)
-  local highlight_settings = process_highlight_settings(colour, bg_colour)
+  local colour, bg_colour, border_colour = get_colour_attributes(span.attributes)
+  local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour)
 
   if highlight_settings == nil then
     return span
@@ -473,8 +589,9 @@ local function highlight(span)
 
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
+  border_colour = highlight_settings.light.border_colour
 
-  if colour == nil and bg_colour == nil then
+  if colour == nil and bg_colour == nil and border_colour == nil then
     return span
   end
 
@@ -484,13 +601,13 @@ local function highlight(span)
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return highlight_html(span, highlight_settings)
   elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
-    return highlight_latex(span, colour, bg_colour, par)
+    return highlight_latex(span, colour, bg_colour, border_colour, par)
   elseif quarto.doc.is_format('docx') then
-    return highlight_openxml_docx(span, colour, bg_colour)
+    return highlight_openxml_docx(span, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('pptx') then
-    return highlight_openxml_pptx(span, colour, bg_colour)
+    return highlight_openxml_pptx(span, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('typst') then
-    return highlight_typst(span, colour, bg_colour)
+    return highlight_typst(span, colour, bg_colour, border_colour)
   else
     return span
   end
@@ -501,8 +618,8 @@ end
 --- @param div table The div element from the document
 --- @return table The modified div or div content with appropriate styling
 local function highlight_block(div)
-  local colour, bg_colour = get_colour_attributes(div.attributes)
-  local highlight_settings = process_highlight_settings(colour, bg_colour)
+  local colour, bg_colour, border_colour = get_colour_attributes(div.attributes)
+  local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour)
 
   if highlight_settings == nil then
     return div
@@ -510,8 +627,9 @@ local function highlight_block(div)
 
   colour = highlight_settings.light.colour
   bg_colour = highlight_settings.light.bg_colour
+  border_colour = highlight_settings.light.border_colour
 
-  if colour == nil and bg_colour == nil then
+  if colour == nil and bg_colour == nil and border_colour == nil then
     return div
   end
 
@@ -522,17 +640,20 @@ local function highlight_block(div)
   div.attributes['bg'] = nil
   div.attributes['bg-colour'] = nil
   div.attributes['bg-color'] = nil
+  div.attributes['bc'] = nil
+  div.attributes['border-colour'] = nil
+  div.attributes['border-color'] = nil
 
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return highlight_html_block(div, highlight_settings)
   elseif quarto.doc.is_format('latex') or quarto.doc.is_format('beamer') then
-    return highlight_latex_block(div, colour, bg_colour)
+    return highlight_latex_block(div, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('docx') then
-    return highlight_openxml_docx_block(div, colour, bg_colour)
+    return highlight_openxml_docx_block(div, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('pptx') then
-    return highlight_openxml_pptx_block(div, colour, bg_colour)
+    return highlight_openxml_pptx_block(div, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('typst') then
-    return highlight_typst_block(div, colour, bg_colour)
+    return highlight_typst_block(div, colour, bg_colour, border_colour)
   else
     return div
   end
