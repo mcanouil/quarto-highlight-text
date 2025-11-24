@@ -172,7 +172,13 @@ format:
 
 ### PowerPoint Output
 
+Links are not supported in highlighted text in PowerPoint output, *i.e.*, URLs will be rendered using default styles.
+
 Border colour is not supported in PowerPoint output.
+
+### Word Output
+
+Links are not supported in highlighted text in Word output, *i.e.*, URLs will be rendered using default styles.
 
 ## Example
 
