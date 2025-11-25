@@ -50,8 +50,11 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 
 ```markdown
 [Red text]{fg="#b22222"}
+[Red text (ink alias)]{ink="#b22222"}
 [Red background]{bg="#abc123"}
+[Red background (paper alias)]{paper="#abc123"}
 [White on Red]{fg="#ffffff" bg="#b22222"}
+[White on Red (ink/paper aliases)]{ink="#ffffff" paper="#b22222"}
 [Text with solid border]{bc="#0000ff"}
 [Text with dashed border]{bc="#b22222" bs="dashed"}
 [Text with dotted border]{bc="#00aa00" border-style="dotted"}
@@ -62,6 +65,10 @@ For block-level highlighting:
 ```markdown
 ::: {fg="#ffffff" bg="#b22222"}
 Block with white text on red background.
+:::
+
+::: {ink="#ffffff" paper="#b22222"}
+Block with white text on red background (ink/paper aliases).
 :::
 
 ::: {bc="#b22222" bg="#ffffcc"}
@@ -75,8 +82,8 @@ Block with blue dashed border and light grey background.
 
 Supported attributes:
 
-- **Foreground (text) colour**: `fg`, `colour`, or `color`
-- **Background colour**: `bg`, `bg-colour`, or `bg-color`
+- **Foreground (text) colour**: `ink`, `fg`, `colour`, or `color`
+- **Background colour**: `paper`, `bg`, `bg-colour`, or `bg-color`
 - **Border colour**: `bc`, `border-colour`, or `border-color`
 - **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`)
 

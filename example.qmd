@@ -152,8 +152,8 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 
 Supported attributes:
 
-- **Foreground (text) colour**: `fg`, `colour`, or `color`
-- **Background colour**: `bg`, `bg-colour`, or `bg-color`
+- **Foreground (text) colour**: `ink`, `fg`, `colour`, or `color`
+- **Background colour**: `paper`, `bg`, `bg-colour`, or `bg-color`
 - **Border colour**: `bc`, `border-colour`, or `border-color`
 - **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`)
 
@@ -171,6 +171,12 @@ Supported attributes:
 
 [Blue text]{color="#0000ff"}
 
+```markdown
+[Green text (ink alias)]{ink="#008000"}
+```
+
+[Green text (ink alias)]{ink="#008000"}
+
 ## Background Colour
 
 ```markdown
@@ -184,6 +190,12 @@ Supported attributes:
 ```
 
 [Blue background]{bg-color="#0000ff"}
+
+```markdown
+[Yellow background (paper alias)]{paper="#ffff00"}
+```
+
+[Yellow background (paper alias)]{paper="#ffff00"}
 
 ## Font and Background Colour
 
@@ -202,6 +214,14 @@ Supported attributes:
 ```
 
 [White text, Blue background]{colour="#ffffff" bg-colour="#0000ff"}
+
+```markdown
+[Black text, Orange background (ink/paper aliases)]{
+  ink="#000000" paper="#ffa500"
+}
+```
+
+[Black text, Orange background (ink/paper aliases)]{ink="#000000" paper="#ffa500"}
 
 ## Border Colour
 
@@ -445,6 +465,20 @@ This block has a green dotted border without background.
 :::: {bc="#00aa00" bs="dotted"}
 
 This block has a green dotted border without background.
+
+:::
+
+```markdown
+:::: {ink="#ffffff" paper="#800080"}
+
+This block uses ink/paper aliases with white text on purple background.
+
+:::
+```
+
+:::: {ink="#ffffff" paper="#800080"}
+
+This block uses ink/paper aliases with white text on purple background.
 
 :::
 
