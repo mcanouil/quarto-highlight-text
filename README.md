@@ -46,7 +46,7 @@ It can contain multiple paragraphs, lists, and other content.
 
 ### Shorter Syntax
 
-You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
+You can use abbreviated attribute names:
 
 ```markdown
 [Red text]{fg="#b22222"}
@@ -89,7 +89,7 @@ Supported attributes:
 
 ### Using Brand Colours
 
-Define colours once in `_brand.yml` and reference them throughout your documents ([v1.1.0](../../releases/tag/1.1.0)):
+Define colours once in `_brand.yml` and reference them throughout your documents:
 
 ```yaml
 color:
@@ -108,13 +108,13 @@ Reference these colours directly by name:
 ```
 
 > [!NOTE]
-> The old `brand-color.` prefix syntax (e.g., `colour="brand-color.red"`) is deprecated but still supported ([v1.4.0](../../releases/tag/1.4.0)).
+> The old `brand-color.` prefix syntax (e.g., `colour="brand-color.red"`) is deprecated but still supported.
 > You'll see a warning when using it.
 > Use the colour name directly instead: `colour="red"`.
 
 ### Light and Dark Theme Support
 
-With Quarto CLI ≥1.7.28, you can define different colours for light and dark themes ([v1.2.0](../../releases/tag/1.2.0)):
+With Quarto CLI ≥1.7.28, you can define different colours for light and dark themes:
 
 **Option 1**: Define themes in document front matter:
 
