@@ -624,8 +624,8 @@ end
 --- @return string|nil border_colour The border colour
 --- @return string|nil border_style The border style
 local function get_colour_attributes(attributes)
-  local colour = attributes['fg'] or attributes['colour'] or attributes['color']
-  local bg_colour = attributes['bg'] or attributes['bg-colour'] or attributes['bg-color']
+  local colour = attributes['ink'] or attributes['fg'] or attributes['colour'] or attributes['color']
+  local bg_colour = attributes['paper'] or attributes['bg'] or attributes['bg-colour'] or attributes['bg-color']
   local border_colour = attributes['bc'] or attributes['border-colour'] or attributes['border-color']
   local border_style = attributes['bs'] or attributes['border-style']
   return colour, bg_colour, border_colour, border_style
