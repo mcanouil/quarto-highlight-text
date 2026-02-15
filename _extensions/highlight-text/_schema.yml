@@ -28,3 +28,7 @@ element-attributes:
       aliases: [bs]
       description: "Border line style."
       enum: [solid, dashed, dotted, double]
+    par:
+      type: boolean
+      default: false
+      description: "Enable paragraph box wrapping for LaTeX output."
