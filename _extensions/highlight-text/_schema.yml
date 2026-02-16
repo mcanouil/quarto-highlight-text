@@ -1,0 +1,34 @@
+# Schema for the highlight-text extension
+# Provides configuration validation and IDE support for element attributes
+# on Span and Div elements with the highlight class.
+
+element-attributes:
+  _any:
+    colour:
+      type: string
+      aliases: [color, ink, fg]
+      description: "Text (foreground) colour. Accepts CSS colour values or brand colour names."
+      completion:
+        type: color
+    bg-colour:
+      type: string
+      aliases: [bg-color, bg, paper]
+      description: "Background colour. Accepts CSS colour values or brand colour names."
+      completion:
+        type: color
+    border-colour:
+      type: string
+      aliases: [border-color, bc]
+      description: "Border colour. Accepts CSS colour values or brand colour names."
+      completion:
+        type: color
+    border-style:
+      type: string
+      default: "solid"
+      aliases: [bs]
+      description: "Border line style."
+      enum: [solid, dashed, dotted, double]
+    par:
+      type: boolean
+      default: false
+      description: "Enable paragraph box wrapping for LaTeX output."
