@@ -2,6 +2,8 @@
 # Provides configuration validation and IDE support for element attributes
 # on Span and Div elements with the highlight class.
 
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v1/extension-schema.json
+
 element-attributes:
   _any:
     colour:
