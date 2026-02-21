@@ -5,7 +5,7 @@ This is a Quarto extension that allows to highlight text in a document for vario
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-highlight-text@2.0.2
+quarto add mcanouil/quarto-highlight-text@2.1.0
 ```
 
 This will install the extension under the `_extensions` subdirectory.
