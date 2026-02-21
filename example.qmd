@@ -104,7 +104,7 @@ This is a Quarto extension that allows to highlight text in a document for vario
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-highlight-text@2.1.0
+quarto add mcanouil/quarto-highlight-text@2.1.1
 ```
 
 This will install the extension under the `_extensions` subdirectory.
