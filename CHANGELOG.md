@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-No user-facing changes.
+### Refactoring
+
+- refactor: Replace monolithic `utils.lua` with focused modules (`string.lua`, `logging.lua`, `metadata.lua`, `pandoc-helpers.lua`, `html.lua`, `paths.lua`, `colour.lua`).
 
 ## 2.1.1 (2026-02-21)
 
@@ -159,8 +161,6 @@ No user-facing changes.
 - fix: Correct extension installation path in README (#9).
 
 ## 0.2.1 (2024-05-04)
-
-No user-facing changes.
 
 ## 0.2.0 (2024-05-04)
 
