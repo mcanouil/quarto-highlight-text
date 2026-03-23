@@ -6,8 +6,8 @@
 --- Extension name constant
 local EXTENSION_NAME = "highlight-text"
 
---- Load utils module
-local utils = require(quarto.utils.resolve_path("_modules/utils.lua"):gsub("%.lua$", ""))
+--- Load modules
+local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
 
 --- Flag to track if deprecation warning has been shown
 --- @type boolean
@@ -28,7 +28,7 @@ local function get_brand_colour(theme, colour)
     brand_colour_key = colour:gsub('^brand%-color%.', '')
     if not deprecation_warning_shown then
       if colour:match("^brand%-color%.") then
-        utils.log_warning(
+        log.log_warning(
           EXTENSION_NAME,
           'Using "brand-color." prefix is deprecated.' ..
           ' Please use the colour name directly (e.g., "' .. brand_colour_key .. '" instead of "' .. colour .. '").'
