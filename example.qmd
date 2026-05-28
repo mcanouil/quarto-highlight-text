@@ -104,7 +104,7 @@ This is a Quarto extension that allows to highlight text in a document for vario
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-highlight-text@2.2.1
+quarto add mcanouil/quarto-highlight-text@2.3.0
 ```
 
 This will install the extension under the `_extensions` subdirectory.
@@ -152,10 +152,12 @@ You can use abbreviated attribute names ([v1.1.1](../../releases/tag/1.1.1)):
 
 Supported attributes:
 
-- **Foreground (text) colour**: `ink`, `fg`, `colour`, or `color`
-- **Background colour**: `paper`, `bg`, `bg-colour`, or `bg-color`
-- **Border colour**: `bc`, `border-colour`, or `border-color`
-- **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`)
+- **Foreground (text) colour**: `ink`, `fg`, `colour`, or `color`.
+- **Background colour**: `paper`, `bg`, `bg-colour`, or `bg-color`.
+- **Border colour**: `bc`, `border-colour`, or `border-color`.
+- **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`).
+- **Opacity** (HTML only): `opacity` accepts a number in `[0, 1]` or a percentage (e.g. `"50%"`).
+- **Gradient fill** (HTML block-level only): `gradient` accepts a full `linear-gradient(...)` value or a comma-separated list of colour stops.
 
 ## Font Colour
 
@@ -509,6 +511,78 @@ This block uses brand colours that adapt to light/dark themes.
 In light mode, this appears as white text on red background.
 
 In dark mode, this appears as red text on white background.
+
+:::
+
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
+
+---
+
+:::
+
+## Opacity (HTML only)
+
+The `opacity` attribute applies a translucent effect.
+When a background colour is present, only the background is made translucent (foreground text remains readable); otherwise the whole element fades.
+
+```markdown
+[Half-transparent background]{bg="#b22222" opacity="0.5"}
+```
+
+[Half-transparent background]{bg="#b22222" opacity="0.5"}
+
+```markdown
+[Fifty per cent fade]{fg="#b22222" opacity="50%"}
+```
+
+[Fifty per cent fade]{fg="#b22222" opacity="50%"}
+
+## CSS `var()` References (HTML only)
+
+Use CSS custom properties to bind colours to theme variables defined elsewhere in your stylesheet.
+
+```markdown
+[Themed text]{fg="var(--bs-primary)"}
+```
+
+[Themed text]{fg="var(--bs-primary)"}
+
+## Gradient Fills (HTML block-level only)
+
+Block divs accept a `gradient` attribute for CSS gradient fills.
+You can pass either a full `linear-gradient(...)`/`radial-gradient(...)` value or a comma-separated list of colour stops (becomes a left-to-right linear gradient).
+
+```markdown
+::: {gradient="#ff7e5f, #feb47b" fg="#ffffff"}
+
+A simple two-stop linear gradient (left-to-right).
+
+:::
+```
+
+::: {gradient="#ff7e5f, #feb47b" fg="#ffffff"}
+
+A simple two-stop linear gradient (left-to-right).
+
+:::
+
+```markdown
+::: {gradient="linear-gradient(135deg, #00b09b 0%, #2575fc 100%)" fg="#ffffff"}
+
+A diagonal linear gradient with explicit stops.
+
+:::
+```
+
+::: {gradient="linear-gradient(135deg, #00b09b 0%, #2575fc 100%)" fg="#ffffff"}
+
+A diagonal linear gradient with explicit stops.
+
+:::
+
+:::: {.content-visible when-format="beamer" when-format="revealjs" when-format="pptx"}
+
+---
 
 :::
 

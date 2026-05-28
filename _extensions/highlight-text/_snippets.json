@@ -18,5 +18,15 @@
 		"prefix": "highlight-div",
 		"body": ["::: {fg=\"${1:#ffffff}\" bg=\"${2:#b22222}\"}", "${3:Block content.}", ":::"],
 		"description": "Wrap a block in foreground/background colour"
+	},
+	"Highlight with opacity": {
+		"prefix": "highlight-opacity",
+		"body": "[${1:text}]{bg=\"${2:#b22222}\" opacity=\"${3:0.5}\"}",
+		"description": "Highlight text with a translucent background (HTML only)"
+	},
+	"Block with gradient": {
+		"prefix": "highlight-gradient",
+		"body": ["::: {gradient=\"${1:#ff7e5f, #feb47b}\"}", "${2:Block content.}", ":::"],
+		"description": "Wrap a block in a CSS gradient fill (HTML only)"
 	}
 }
