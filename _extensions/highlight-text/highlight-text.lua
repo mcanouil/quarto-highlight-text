@@ -105,6 +105,34 @@ local function to_hex6(colour)
   return nil
 end
 
+--- Convert foreground, background, and border colours to 6-character hex for a binary writer
+--- (LaTeX, Word, PowerPoint). Emits a warning for each value that cannot be expressed as hex.
+--- @param colour string|nil The foreground colour value
+--- @param bg_colour string|nil The background colour value
+--- @param border_colour string|nil The border colour value
+--- @param format_label string Human-readable format label used in warnings (e.g. "LaTeX")
+--- @return string|nil, string|nil, string|nil colour_hex, bg_hex, border_hex
+local function resolve_hex_triplet(colour, bg_colour, border_colour, format_label)
+  local pairs_list = {
+    { name = 'foreground colour', value = colour },
+    { name = 'background colour', value = bg_colour },
+    { name = 'border colour',     value = border_colour },
+  }
+  local results = {}
+  for i, entry in ipairs(pairs_list) do
+    local hex = to_hex6(entry.value)
+    if entry.value ~= nil and hex == nil then
+      log.log_warning(
+        EXTENSION_NAME,
+        'Ignoring ' .. entry.name .. ' "' .. entry.value .. '" for ' .. format_label ..
+        ' output: not convertible to hex.'
+      )
+    end
+    results[i] = hex
+  end
+  return results[1], results[2], results[3]
+end
+
 --- Apply opacity to a CSS-style colour value when the colour is a hex code.
 --- Returns the original value unchanged when conversion is not possible (e.g. `var()`, rgb()).
 --- For hex inputs, returns an `rgba()` string.
@@ -287,28 +315,7 @@ end
 local function highlight_latex(span, colour, bg_colour, border_colour, border_style, par)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
 
-  local colour_hex = to_hex6(colour)
-  local bg_hex = to_hex6(bg_colour)
-  local border_hex = to_hex6(border_colour)
-
-  if colour ~= nil and colour_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring foreground colour "' .. colour .. '" for LaTeX output: not convertible to hex.'
-    )
-  end
-  if bg_colour ~= nil and bg_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring background colour "' .. bg_colour .. '" for LaTeX output: not convertible to hex.'
-    )
-  end
-  if border_colour ~= nil and border_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring border colour "' .. border_colour .. '" for LaTeX output: not convertible to hex.'
-    )
-  end
+  local colour_hex, bg_hex, border_hex = resolve_hex_triplet(colour, bg_colour, border_colour, 'LaTeX')
 
   if is_lualatex and bg_hex ~= nil then
     quarto.doc.use_latex_package('luacolor, lua-ul')
@@ -378,28 +385,7 @@ end
 local function highlight_latex_block(div, colour, bg_colour, border_colour, border_style)
   local is_lualatex = quarto.doc.pdf_engine() == 'lualatex'
 
-  local colour_hex = to_hex6(colour)
-  local bg_hex = to_hex6(bg_colour)
-  local border_hex = to_hex6(border_colour)
-
-  if colour ~= nil and colour_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring foreground colour "' .. colour .. '" for LaTeX output: not convertible to hex.'
-    )
-  end
-  if bg_colour ~= nil and bg_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring background colour "' .. bg_colour .. '" for LaTeX output: not convertible to hex.'
-    )
-  end
-  if border_colour ~= nil and border_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring border colour "' .. border_colour .. '" for LaTeX output: not convertible to hex.'
-    )
-  end
+  local colour_hex, bg_hex, border_hex = resolve_hex_triplet(colour, bg_colour, border_colour, 'LaTeX')
 
   if bg_hex ~= nil then
     if is_lualatex then
@@ -494,28 +480,7 @@ end
 --- @param border_style string|nil The border style to apply
 --- @return table The span content with OpenXML markup for Word
 local function highlight_openxml_docx(span, colour, bg_colour, border_colour, border_style)
-  local colour_hex = to_hex6(colour)
-  local bg_hex = to_hex6(bg_colour)
-  local border_hex = to_hex6(border_colour)
-
-  if colour ~= nil and colour_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring foreground colour "' .. colour .. '" for Word output: not convertible to hex.'
-    )
-  end
-  if bg_colour ~= nil and bg_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring background colour "' .. bg_colour .. '" for Word output: not convertible to hex.'
-    )
-  end
-  if border_colour ~= nil and border_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring border colour "' .. border_colour .. '" for Word output: not convertible to hex.'
-    )
-  end
+  local colour_hex, bg_hex, border_hex = resolve_hex_triplet(colour, bg_colour, border_colour, 'Word')
 
   local spec = '<w:r><w:rPr>'
   if bg_hex ~= nil then
@@ -552,28 +517,7 @@ end
 --- @param border_style string|nil The border style to apply
 --- @return table The div content with OpenXML markup for Word
 local function highlight_openxml_docx_block(div, colour, bg_colour, border_colour, border_style)
-  local colour_hex = to_hex6(colour)
-  local bg_hex = to_hex6(bg_colour)
-  local border_hex = to_hex6(border_colour)
-
-  if colour ~= nil and colour_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring foreground colour "' .. colour .. '" for Word output: not convertible to hex.'
-    )
-  end
-  if bg_colour ~= nil and bg_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring background colour "' .. bg_colour .. '" for Word output: not convertible to hex.'
-    )
-  end
-  if border_colour ~= nil and border_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring border colour "' .. border_colour .. '" for Word output: not convertible to hex.'
-    )
-  end
+  local colour_hex, bg_hex, border_hex = resolve_hex_triplet(colour, bg_colour, border_colour, 'Word')
 
   local spec = '<w:pPr>'
   if bg_hex ~= nil then
@@ -634,21 +578,8 @@ end
 --- @param border_colour string|nil The border colour (warned and discarded)
 --- @return table Raw inline containing OpenXML markup for PowerPoint
 local function highlight_openxml_pptx(span, colour, bg_colour, border_colour)
-  local colour_hex = to_hex6(colour)
-  local bg_hex = to_hex6(bg_colour)
+  local colour_hex, bg_hex = resolve_hex_triplet(colour, bg_colour, nil, 'PowerPoint')
 
-  if colour ~= nil and colour_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring foreground colour "' .. colour .. '" for PowerPoint output: not convertible to hex.'
-    )
-  end
-  if bg_colour ~= nil and bg_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring background colour "' .. bg_colour .. '" for PowerPoint output: not convertible to hex.'
-    )
-  end
   if border_colour ~= nil then
     warn_pptx_border_discarded('inline')
   end
@@ -677,21 +608,8 @@ end
 --- @param border_colour string|nil The border colour (warned and discarded)
 --- @return table The div content with OpenXML markup for PowerPoint
 local function highlight_openxml_pptx_block(div, colour, bg_colour, border_colour)
-  local colour_hex = to_hex6(colour)
-  local bg_hex = to_hex6(bg_colour)
+  local colour_hex, bg_hex = resolve_hex_triplet(colour, bg_colour, nil, 'PowerPoint')
 
-  if colour ~= nil and colour_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring foreground colour "' .. colour .. '" for PowerPoint output: not convertible to hex.'
-    )
-  end
-  if bg_colour ~= nil and bg_hex == nil then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Ignoring background colour "' .. bg_colour .. '" for PowerPoint output: not convertible to hex.'
-    )
-  end
   if border_colour ~= nil then
     warn_pptx_border_discarded('block')
   end
