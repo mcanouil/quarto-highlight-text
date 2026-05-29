@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 2.3.0 (2026-05-28)
-
 ### New Features
 
 - feat: Validate colour values and warn on unrecognised hex/CSS/named values instead of crashing.
