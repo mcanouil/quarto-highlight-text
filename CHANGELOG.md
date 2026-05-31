@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: Validate colour values and warn on unrecognised hex/CSS/named values instead of crashing.
+- feat: Support CSS `var(--...)` references for foreground, background, and border colours (HTML only).
+- feat: Add `opacity` attribute for translucent text/background (HTML only).
+- feat: Add `gradient` attribute for block-level gradient fills (HTML only).
+- feat: Warn once per render when PowerPoint discards a border colour.
+
+### Bug Fixes
+
+- fix: Stop crashing when a border colour is not a 6-character hex (named CSS colours and invalid hex no longer raise a runtime error).
+- fix: Strip `ink`/`paper` (and other input aliases) so they no longer leak as `data-*` attributes in HTML output.
+- fix: Synchronise shared modules (`logging.lua`, `colour.lua`) with canonical versions.
+
 ## 2.2.1 (2026-04-15)
 
 ### Refactoring

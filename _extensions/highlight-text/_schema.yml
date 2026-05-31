@@ -2,26 +2,26 @@
 # Provides configuration validation and IDE support for attributes
 # on Span and Div elements with the highlight class.
 
-$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v1/extension-schema.json
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
 
 attributes:
   _any:
     colour:
       type: string
       aliases: [color, ink, fg]
-      description: "Text (foreground) colour. Accepts CSS colour values or brand colour names."
+      description: "Text (foreground) colour. Accepts CSS colour values, brand colour names, or CSS `var(...)` references (HTML only)."
       completion:
         type: color
     bg-colour:
       type: string
       aliases: [bg-color, bg, paper]
-      description: "Background colour. Accepts CSS colour values or brand colour names."
+      description: "Background colour. Accepts CSS colour values, brand colour names, or CSS `var(...)` references (HTML only)."
       completion:
         type: color
     border-colour:
       type: string
       aliases: [border-color, bc]
-      description: "Border colour. Accepts CSS colour values or brand colour names."
+      description: "Border colour. Accepts CSS colour values, brand colour names, or CSS `var(...)` references (HTML only)."
       completion:
         type: color
     border-style:
@@ -34,3 +34,9 @@ attributes:
       type: boolean
       default: false
       description: "Enable paragraph box wrapping for LaTeX output."
+    opacity:
+      type: string
+      description: "Opacity in [0, 1] or as a percentage (e.g. \"50%\"). HTML and Typst; applied to the background when present, otherwise to the element/text."
+    gradient:
+      type: string
+      description: "Block-level gradient fill. Accepts a full `linear-gradient(...)`/`radial-gradient(...)` value, or a comma-separated list of colour stops (becomes a left-to-right linear gradient). HTML and Typst (block-level only)."

@@ -82,10 +82,16 @@ Block with blue dashed border and light grey background.
 
 Supported attributes:
 
-- **Foreground (text) colour**: `ink`, `fg`, `colour`, or `color`
-- **Background colour**: `paper`, `bg`, `bg-colour`, or `bg-color`
-- **Border colour**: `bc`, `border-colour`, or `border-color`
-- **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`)
+- **Foreground (text) colour**: `ink`, `fg`, `colour`, or `color`.
+- **Background colour**: `paper`, `bg`, `bg-colour`, or `bg-color`.
+- **Border colour**: `bc`, `border-colour`, or `border-color`.
+- **Border style**: `bs` or `border-style` (values: `solid`, `dashed`, `dotted`, `double`; defaults to `solid`).
+- **Opacity** (HTML and Typst): `opacity` accepts a number in `[0, 1]` or a percentage (e.g. `"50%"`). Applied to the background when present, otherwise to the element as a whole.
+- **Gradient fill** (HTML and Typst, block-level only): `gradient` accepts a full `linear-gradient(...)`/`radial-gradient(...)` value or a comma-separated list of colour stops (becomes a left-to-right linear gradient). Typst output uses native `gradient.linear`/`gradient.radial`.
+
+Colour values accept hex codes (`#RGB`/`#RRGGBB`), CSS functional notation (`rgb()`, `hsl()`, `hwb()`), CSS named colours, brand colour names, and CSS custom properties (`var(--brand-primary)`).
+CSS `var()` references are only resolved by the browser, so they apply to HTML/RevealJS output only.
+Invalid colour values are skipped with a warning rather than producing malformed output.
 
 ### Using Brand Colours
 
@@ -182,6 +188,7 @@ format:
 Links are not supported in highlighted text in PowerPoint output, *i.e.*, URLs will be rendered using default styles.
 
 Border colour is not supported in PowerPoint output.
+A warning is emitted once per render when a border colour is requested for PowerPoint.
 
 ### Word Output
 
