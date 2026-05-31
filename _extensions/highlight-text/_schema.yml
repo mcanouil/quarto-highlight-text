@@ -36,7 +36,7 @@ attributes:
       description: "Enable paragraph box wrapping for LaTeX output."
     opacity:
       type: string
-      description: "Opacity in [0, 1] or as a percentage (e.g. \"50%\"). HTML only; applied to the background when present, otherwise to the element."
+      description: "Opacity in [0, 1] or as a percentage (e.g. \"50%\"). HTML and Typst; applied to the background when present, otherwise to the element/text."
     gradient:
       type: string
-      description: "Block-level gradient fill. Accepts a full `linear-gradient(...)`/`radial-gradient(...)` value, or a comma-separated list of colour stops (becomes a left-to-right linear gradient). HTML only."
+      description: "Block-level gradient fill. Accepts a full `linear-gradient(...)`/`radial-gradient(...)` value, or a comma-separated list of colour stops (becomes a left-to-right linear gradient). HTML and Typst (block-level only)."

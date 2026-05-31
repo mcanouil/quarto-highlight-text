@@ -151,6 +151,17 @@ local function apply_opacity_css(colour, opacity)
   return string.format('rgba(%d, %d, %d, %s)', r, g, b, tostring(opacity))
 end
 
+--- Apply an opacity to a Typst colour expression via `.transparentize()`.
+--- An opacity of `o` maps to `transparentize((1 - o) * 100%)` so that `o = 0.5`
+--- yields `transparentize(50%)`.
+--- @param colour string A Typst colour expression (e.g. `rgb("#...")`)
+--- @param opacity number A value in [0, 1]
+--- @return string The colour expression with `.transparentize(P%)` appended
+local function apply_opacity_typst(colour, opacity)
+  local pct = (1 - opacity) * 100
+  return colour .. '.transparentize(' .. string.format('%g', pct) .. '%)'
+end
+
 --- Parse and validate an opacity attribute value.
 --- Accepts a number in [0, 1] or a percentage string (e.g. "50%").
 --- Out-of-range or malformed values emit a warning and return nil.
@@ -193,6 +204,123 @@ local function parse_gradient(value)
     return str
   end
   return 'linear-gradient(to right, ' .. str .. ')'
+end
+
+--- Split a string on top-level commas, ignoring commas nested in parentheses.
+--- Keeps commas inside `rgb(0, 0, 0)`/`hsl(...)` from splitting colour stops.
+--- @param str string The string to split
+--- @return table A list of trimmed, non-empty segments
+local function split_top_level_commas(str)
+  local parts = {}
+  local depth = 0
+  local current = ''
+  for i = 1, #str do
+    local ch = str:sub(i, i)
+    if ch == '(' then
+      depth = depth + 1
+      current = current .. ch
+    elseif ch == ')' then
+      depth = depth - 1
+      current = current .. ch
+    elseif ch == ',' and depth == 0 then
+      parts[#parts + 1] = current:match('^%s*(.-)%s*$')
+      current = ''
+    else
+      current = current .. ch
+    end
+  end
+  if current:match('%S') then
+    parts[#parts + 1] = current:match('^%s*(.-)%s*$')
+  end
+  return parts
+end
+
+--- Parse a single CSS colour stop into a Typst-ready table.
+--- Separates an optional trailing position (e.g. `0%`, `2em`) from the colour and
+--- wraps the colour as `rgb("...")` (matching the Typst branch of `get_brand_colour`).
+--- @param stop string A single colour stop (e.g. `#00b09b 0%`)
+--- @return table A table `{ colour = 'rgb("...")', position = <string|nil> }`
+local function parse_stop(stop)
+  local colour, position = stop:match('^(.-)%s+([%-%d%.]+%%?[a-z]*)$')
+  if colour == nil then
+    colour = stop
+  end
+  return {
+    colour = 'rgb("' .. colour:match('^%s*(.-)%s*$') .. '")',
+    position = position
+  }
+end
+
+--- Parse a `gradient` attribute into a structured representation for Typst rendering.
+--- Accepts the same inputs as `parse_gradient` (full `linear-gradient(...)`/
+--- `radial-gradient(...)` or a comma-separated colour-stop shorthand).
+--- @param value string|nil The raw attribute value
+--- @return table|nil A table
+---   `{ kind = 'linear'|'radial', dir = <'ltr'|'rtl'|'ttb'|'btt'|nil>, angle = <number|nil>,
+---      stops = { { colour = ..., position = ... }, ... } }`, or nil
+local function parse_gradient_typst(value)
+  if value == nil then return nil end
+  local str = pandoc.utils.stringify(value)
+  if str == '' then return nil end
+
+  local kind, dir, angle = 'linear', nil, nil
+  local inner
+
+  local linear = str:match('^%s*linear%-gradient%s*%((.*)%)%s*$')
+  local radial = str:match('^%s*radial%-gradient%s*%((.*)%)%s*$')
+
+  if radial ~= nil then
+    kind = 'radial'
+    inner = radial
+  elseif linear ~= nil then
+    local segments = split_top_level_commas(linear)
+    local first = segments[1] or ''
+    local degrees = first:match('^([%-%d%.]+)deg$')
+    if first:match('^to%s+') then
+      local keyword = first:gsub('^to%s+', '')
+      local directions = { right = 'ltr', left = 'rtl', bottom = 'ttb', top = 'btt' }
+      dir = directions[keyword]
+      table.remove(segments, 1)
+    elseif degrees ~= nil then
+      angle = (tonumber(degrees) - 90) % 360
+      table.remove(segments, 1)
+    end
+    inner = table.concat(segments, ', ')
+  else
+    dir = 'ltr'
+    inner = str
+  end
+
+  local stops = {}
+  for _, segment in ipairs(split_top_level_commas(inner)) do
+    stops[#stops + 1] = parse_stop(segment)
+  end
+  if #stops == 0 then return nil end
+
+  return { kind = kind, dir = dir, angle = angle, stops = stops }
+end
+
+--- Render a structured gradient (from `parse_gradient_typst`) as Typst markup.
+--- @param gradient table The structured gradient
+--- @return string A Typst `gradient.linear(...)`/`gradient.radial(...)` expression
+local function gradient_to_typst(gradient)
+  local args = {}
+  if gradient.kind == 'linear' then
+    if gradient.angle ~= nil then
+      args[#args + 1] = 'angle: ' .. string.format('%g', gradient.angle) .. 'deg'
+    elseif gradient.dir ~= nil then
+      args[#args + 1] = 'dir: ' .. gradient.dir
+    end
+  end
+  for _, stop in ipairs(gradient.stops) do
+    if stop.position ~= nil then
+      args[#args + 1] = '(' .. stop.colour .. ', ' .. stop.position .. ')'
+    else
+      args[#args + 1] = stop.colour
+    end
+  end
+  local fn = gradient.kind == 'radial' and 'gradient.radial' or 'gradient.linear'
+  return fn .. '(' .. table.concat(args, ', ') .. ')'
 end
 
 --- Strip every input-alias attribute consumed by the filter so they do not leak to output.
@@ -644,11 +772,20 @@ end
 --- @param bg_colour string|nil The background colour to apply
 --- @param border_colour string|nil The border colour to apply
 --- @param border_style string|nil The border style to apply
+--- @param opacity number|nil The opacity in [0, 1] (applied to background if present, else foreground)
 --- @return table The span content with Typst markup
-local function highlight_typst(span, colour, bg_colour, border_colour, border_style)
+local function highlight_typst(span, colour, bg_colour, border_colour, border_style, opacity)
+  if opacity ~= nil and bg_colour ~= nil then
+    bg_colour = apply_opacity_typst(bg_colour, opacity)
+  end
+
   local colour_open, colour_close = '', ''
   if colour ~= nil then
-    colour_open = '#text(' .. colour .. ')['
+    local text_colour = colour
+    if opacity ~= nil and bg_colour == nil then
+      text_colour = apply_opacity_typst(colour, opacity)
+    end
+    colour_open = '#text(' .. text_colour .. ')['
     colour_close = ']'
   end
 
@@ -700,11 +837,28 @@ end
 --- @param bg_colour string|nil The background colour to apply
 --- @param border_colour string|nil The border colour to apply
 --- @param border_style string|nil The border style to apply
+--- @param opacity number|nil The opacity in [0, 1] (ignored when a gradient is present)
+--- @param gradient table|nil A structured gradient from `parse_gradient_typst`
 --- @return table The div content with Typst markup
-local function highlight_typst_block(div, colour, bg_colour, border_colour, border_style)
+local function highlight_typst_block(div, colour, bg_colour, border_colour, border_style, opacity, gradient)
+  -- Resolve the block fill: a gradient takes precedence over a background colour.
+  local fill = nil
+  if gradient ~= nil then
+    fill = gradient_to_typst(gradient)
+  elseif bg_colour ~= nil then
+    fill = bg_colour
+    if opacity ~= nil then
+      fill = apply_opacity_typst(fill, opacity)
+    end
+  end
+
   local colour_open, colour_close = '', ''
   if colour ~= nil then
-    colour_open = '#text(' .. colour .. ')['
+    local text_colour = colour
+    if opacity ~= nil and gradient == nil and bg_colour == nil then
+      text_colour = apply_opacity_typst(colour, opacity)
+    end
+    colour_open = '#text(' .. text_colour .. ')['
     colour_close = ']'
   end
 
@@ -724,18 +878,18 @@ local function highlight_typst_block(div, colour, bg_colour, border_colour, bord
     end
   end
 
-  if border_colour ~= nil and bg_colour ~= nil then
+  if border_colour ~= nil and fill ~= nil then
     local stroke_spec = build_stroke(border_colour, border_style)
     border_open = '#block(stroke: ' ..
-        stroke_spec .. ', fill: ' .. bg_colour .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
+        stroke_spec .. ', fill: ' .. fill .. ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
     border_close = ']'
   elseif border_colour ~= nil then
     local stroke_spec = build_stroke(border_colour, border_style)
     border_open = '#block(stroke: ' .. stroke_spec ..
         ', inset: (x: 0.5em, y: 0.9em), radius: 0.2em)['
     border_close = ']'
-  elseif bg_colour ~= nil then
-    bg_colour_open = '#block(fill: ' .. bg_colour .. ', inset: 0.5em, radius: 0.2em)['
+  elseif fill ~= nil then
+    bg_colour_open = '#block(fill: ' .. fill .. ', inset: 0.5em, radius: 0.2em)['
     bg_colour_close = ']'
   end
 
@@ -846,7 +1000,7 @@ local function highlight(span)
   elseif quarto.doc.is_format('pptx') then
     return highlight_openxml_pptx(span, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('typst') then
-    return highlight_typst(span, colour, bg_colour, border_colour, border_style)
+    return highlight_typst(span, colour, bg_colour, border_colour, border_style, opacity)
   else
     return span
   end
@@ -860,6 +1014,7 @@ local function highlight_block(div)
   local colour, bg_colour, border_colour, border_style = get_colour_attributes(div.attributes)
   local opacity = parse_opacity(div.attributes['opacity'])
   local gradient = parse_gradient(div.attributes['gradient'])
+  local gradient_typst = parse_gradient_typst(div.attributes['gradient'])
   local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style, opacity, gradient)
 
   if highlight_settings == nil then
@@ -875,10 +1030,10 @@ local function highlight_block(div)
     return div
   end
 
-  if gradient ~= nil and not (quarto.doc.is_format('html') or quarto.doc.is_format('revealjs')) then
+  if gradient ~= nil and not (quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') or quarto.doc.is_format('typst')) then
     log.log_warning(
       EXTENSION_NAME,
-      'The "gradient" attribute is only supported in HTML/RevealJS output; ignoring for format "' .. FORMAT .. '".'
+      'The "gradient" attribute is only supported in HTML/RevealJS/Typst output; ignoring for format "' .. FORMAT .. '".'
     )
   end
 
@@ -893,7 +1048,7 @@ local function highlight_block(div)
   elseif quarto.doc.is_format('pptx') then
     return highlight_openxml_pptx_block(div, colour, bg_colour, border_colour)
   elseif quarto.doc.is_format('typst') then
-    return highlight_typst_block(div, colour, bg_colour, border_colour, border_style)
+    return highlight_typst_block(div, colour, bg_colour, border_colour, border_style, opacity, gradient_typst)
   else
     return div
   end
