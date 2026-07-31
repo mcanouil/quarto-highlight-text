@@ -1,0 +1,139 @@
+---
+title: "Examples"
+subtitle: "Every attribute, rendered."
+description: "Text, background, border, opacity, and gradient highlighting produced by the extension, with the source alongside each."
+---
+
+Everything below is coloured by the filter as this page is rendered.
+
+## Foreground and background
+
+| Source | Renders as |
+| --- | --- |
+| `[Red text]{fg="#b22222"}` | [Red text]{fg="#b22222"} |
+| `[On yellow]{bg="#ffffcc"}` | [On yellow]{bg="#ffffcc"} |
+| `[White on red]{fg="#ffffff" bg="#b22222"}` | [White on red]{fg="#ffffff" bg="#b22222"} |
+| `[Ink and paper]{ink="#ffffff" paper="#0000ff"}` | [Ink and paper]{ink="#ffffff" paper="#0000ff"} |
+
+: The colour attributes and their aliases. {.striped .hover tbl-colwidths="[55,45]"}
+
+`ink` and `paper` are aliases of `fg` and `bg`; `colour`, `color`, `bg-colour`, and `bg-color` work too.
+
+## Borders
+
+A border needs a colour; the style defaults to solid.
+
+| Source | Renders as |
+| --- | --- |
+| `[Solid]{bc="#0000ff"}` | [Solid]{bc="#0000ff"} |
+| `[Dashed]{bc="#b22222" bs="dashed"}` | [Dashed]{bc="#b22222" bs="dashed"} |
+| `[Dotted]{bc="#00aa00" border-style="dotted"}` | [Dotted]{bc="#00aa00" border-style="dotted"} |
+| `[Double]{bc="#b22222" bs="double"}` | [Double]{bc="#b22222" bs="double"} |
+
+: Border colours and styles. {.striped .hover tbl-colwidths="[55,45]"}
+
+## Colour values
+
+Any CSS colour form works, alongside hex.
+
+| Source | Renders as |
+| --- | --- |
+| `[Named]{fg="firebrick"}` | [Named]{fg="firebrick"} |
+| `[Functional]{fg="rgb(178 34 34)"}` | [Functional]{fg="rgb(178 34 34)"} |
+| `[Short hex]{bg="#fcc"}` | [Short hex]{bg="#fcc"} |
+
+: Accepted colour forms. {.striped .hover tbl-colwidths="[55,45]"}
+
+An invalid value is skipped with a warning rather than written out.
+
+## Blocks
+
+A div colours everything inside it.
+
+```markdown
+::: {fg="#ffffff" bg="#b22222"}
+A block with white text on a red background.
+
+It can hold several paragraphs.
+:::
+```
+
+::: {fg="#ffffff" bg="#b22222"}
+A block with white text on a red background.
+
+It can hold several paragraphs.
+:::
+
+With a border and a background:
+
+```markdown
+::: {bc="#0000ff" bg="#f0f0f0" bs="dashed"}
+A block with a blue dashed border.
+:::
+```
+
+::: {bc="#0000ff" bg="#f0f0f0" bs="dashed"}
+A block with a blue dashed border.
+:::
+
+## Opacity
+
+`opacity` takes a number or a percentage, and applies to the background when there is one.
+
+| Source | Renders as |
+| --- | --- |
+| `[Half]{bg="#b22222" opacity="0.5"}` | [Half]{bg="#b22222" opacity="0.5"} |
+| `[A quarter]{bg="#b22222" opacity="25%"}` | [A quarter]{bg="#b22222" opacity="25%"} |
+
+: Opacity, in HTML and Typst only. {.striped .hover tbl-colwidths="[55,45]"}
+
+## Gradients
+
+Blocks only, in HTML and Typst.
+
+```markdown
+::: {gradient="#b22222, #abc123"}
+A gradient from a list of colour stops.
+:::
+```
+
+::: {gradient="#b22222, #abc123"}
+A gradient from a list of colour stops.
+:::
+
+```markdown
+::: {gradient="linear-gradient(135deg, #0000ff, #ffffff)"}
+A full CSS gradient value.
+:::
+```
+
+::: {gradient="linear-gradient(135deg, #0000ff, #ffffff)"}
+A full CSS gradient value.
+:::
+
+## Brand colours
+
+Name a colour once in `_brand.yml` and use the name everywhere:
+
+```yaml
+color:
+  palette:
+    red: "#b22222"
+  primary: "#abc123"
+```
+
+```markdown
+[Red text]{fg="red"}
+[Primary highlight]{bg="primary"}
+```
+
+The same names then follow a light and dark brand pair, and HTML switches between them with the theme.
+
+## Other formats
+
+This page is HTML, so the opacity and gradient sections above are the two features it can show that a PDF cannot.
+The repository's `example.qmd` is rendered to every supported format on each release, and those files are attached to the release.
+
+## Source
+
+The repository ships a short, standalone starting point you can copy: [`example.qmd`](https://github.com/mcanouil/quarto-highlight-text/blob/main/example.qmd).

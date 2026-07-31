@@ -1,0 +1,130 @@
+---
+title: "Reference"
+subtitle: "Every attribute the highlight-text extension accepts."
+description: "The complete highlight-text configuration: the colour attributes and their aliases, accepted colour values, brand colours, light and dark themes, and per-format support."
+---
+
+## Enabling the filter
+
+```yaml
+filters:
+  - highlight-text
+```
+
+## Syntax
+
+A span colours inline text; a div colours a block.
+
+```markdown
+[Inline]{fg="#b22222" bg="#ffffcc"}
+
+::: {fg="#ffffff" bg="#b22222"}
+A block.
+:::
+```
+
+## Attributes
+
+Each has several spellings, so a document can keep whichever reads best.
+
+| Attribute | Aliases | Description |
+| --- | --- | --- |
+| Foreground | `ink`, `fg`, `colour`, `color` | Text colour. |
+| Background | `paper`, `bg`, `bg-colour`, `bg-color` | Background colour. |
+| Border colour | `bc`, `border-colour`, `border-color` | Border colour. Drawing a border needs this attribute. |
+| Border style | `bs`, `border-style` | `solid`, `dashed`, `dotted`, or `double`. Defaults to `solid`. |
+| Opacity | `opacity` | A number from `0` to `1`, or a percentage such as `"50%"`. Applied to the background when there is one, otherwise to the whole element. |
+| Gradient | `gradient` | A full `linear-gradient(...)` or `radial-gradient(...)`, or a comma-separated list of colour stops, which becomes a left-to-right linear gradient. Blocks only. |
+| Line wrapping | `par` | LaTeX only. Wraps inline highlighted text in a `\parbox` so it can break across lines. |
+
+: Attributes accepted on a span or a div. {.striped .hover tbl-colwidths="[15,28,57]"}
+
+## Colour values
+
+| Form | Example | Notes |
+| --- | --- | --- |
+| Hex | `#b22222`, `#abc` | Three or six digits. |
+| CSS functional | `rgb(178 34 34)`, `hsl(0 71% 42%)`, `hwb(0 13% 30%)` | |
+| CSS named | `firebrick` | |
+| Brand colour | `red`, `primary` | A name from the `color.palette` or the role names in `_brand.yml`. |
+| CSS custom property | `var(--brand-primary)` | Resolved by the browser, so HTML and RevealJS only. |
+
+: Accepted colour values. {.striped .hover tbl-colwidths="[20,38,42]"}
+
+An invalid colour is skipped with a warning rather than written out, so a typo cannot produce malformed LaTeX or broken CSS.
+
+### Brand colours
+
+```yaml
+color:
+  palette:
+    red: "#b22222"
+    custom-blue: "#0000ff"
+  primary: "#abc123"
+```
+
+```markdown
+[Red text]{fg="red"}
+[Primary highlight]{bg="primary"}
+```
+
+::: {.callout-note}
+The older `brand-color.` prefix, as in `colour="brand-color.red"`, still works and warns.
+Use the plain name.
+:::
+
+### Light and dark
+
+With Quarto 1.7.28 or later, a brand can define both:
+
+```yaml
+brand:
+  light: _brand.yml
+  dark: _brand-dark.yml
+```
+
+```markdown
+[This adapts to the theme]{fg="fg" bg="bg"}
+```
+
+Only HTML switches between them live.
+Every other format takes the light value, or the dark one when there is no light.
+
+## Format support
+
+| Feature | HTML, RevealJS | LaTeX, Beamer | Typst | Word | PowerPoint |
+| --- | --- | --- | --- | --- | --- |
+| Foreground and background | Yes | Yes | Yes | Yes | Yes |
+| Border | Yes | Yes | Yes | Yes | No |
+| Opacity | Yes | No | Yes | No | No |
+| Gradient | Yes | No | Yes | No | No |
+| `var()` colours | Yes | No | No | No | No |
+| Links inside highlights | Yes | Yes | Yes | No | No |
+
+: What each format supports. {.striped .hover tbl-colwidths="[28,15,14,10,10,23]"}
+
+A border colour requested in PowerPoint warns once per render.
+
+## LaTeX line wrapping
+
+`\colorbox` does not break across lines, so a long inline highlight overflows.
+
+- Blocks wrap automatically; the filter uses `\parbox` for every engine except LuaLaTeX.
+- Inline highlights need `par=true`, which applies to XeLaTeX and PDFLaTeX.
+- LuaLaTeX handles it properly through `lua-ul`, and needs neither.
+
+```yaml
+format:
+  pdf:
+    pdf-engine: lualatex
+```
+
+LuaLaTeX is the default from Quarto 1.8.25.
+
+## Limitations
+
+- Word and PowerPoint drop links inside highlighted text, rendering them in the default style.
+- PowerPoint has no border support.
+- Opacity and gradients reach HTML and Typst only.
+- `var()` colours are resolved by the browser, so they are HTML and RevealJS only.
+- Gradients apply to blocks, not to inline spans.

@@ -1,6 +1,8 @@
 /.luarc.json
 /.quarto/
-_quarto.yml
+# Anchored: the generated project file at the root only. Unanchored, this
+# also matched docs/_quarto.yml, which the documentation website needs.
+/_quarto.yml
 *.html
 *.pdf
 *.docx

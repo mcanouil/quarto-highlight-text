@@ -1,0 +1,80 @@
+---
+title: "Highlight Text"
+subtitle: "Colour text, backgrounds, and borders, in every format."
+description: "What the highlight-text extension is for, how to enable it, and the smallest span that colours a run of text."
+authors:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
+---
+
+Colouring a word in a Quarto document usually means writing raw HTML, which then disappears from the PDF, the Word file, and the slides.
+Every format has its own mechanism, and none of them is markdown.
+
+`highlight-text` gives all of them one syntax.
+A span or a div carries the colours as attributes, and the filter writes whatever the current format needs: a styled span in HTML, `\colorbox` in LaTeX, `text(fill: ...)` in Typst, run properties in Word and PowerPoint.
+
+## Installation
+
+```bash
+quarto add {{< var extension.reference >}}
+```
+
+This will install the extension under the `_extensions` subdirectory.
+If you are using version control, you will want to check in this directory.
+
+Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto-wizard):
+
+::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
+
+[Visual Studio Code](vscode://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Visual Studio Code using the Quarto Wizard extension."}
+[Positron](positron://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Positron using the Quarto Wizard extension."}
+[VSCodium](vscodium://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in VSCodium using the Quarto Wizard extension."}
+
+:::
+
+## Quick start
+
+Enable the filter:
+
+```yaml
+filters:
+  - highlight-text
+```
+
+Then colour a span:
+
+```markdown
+[Red text]{fg="#b22222"}
+[White on red]{fg="#ffffff" bg="#b22222"}
+```
+
+Which renders as [Red text]{fg="#b22222"} and [White on red]{fg="#ffffff" bg="#b22222"}.
+
+Or a whole block:
+
+```markdown
+::: {fg="#ffffff" bg="#b22222"}
+A block with white text on a red background.
+:::
+```
+
+::: {fg="#ffffff" bg="#b22222"}
+A block with white text on a red background.
+:::
+
+See the [Reference](reference.qmd) for every attribute, and the [Examples](examples.qmd) for each of them rendered.
+
+## Where it works
+
+HTML, LaTeX, Typst, Word, PowerPoint, RevealJS, and Beamer.
+
+The filter writes what each format understands, so a document that renders to several of them keeps its colours in all of them.
+A few features are format-specific, and the [Reference](reference.qmd#format-support) says which.
+
+## Links
+
+- [Reference](reference.qmd) for every attribute and its format support.
+- [Examples](examples.qmd) for rendered output.
+- [Changelog](changelog.qmd) for what each release changed.
+- [Source and issues](https://github.com/mcanouil/quarto-highlight-text) on GitHub.
