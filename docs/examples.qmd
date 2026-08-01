@@ -34,7 +34,7 @@ A border needs a colour; the style defaults to solid.
 
 ## Colour values
 
-Any CSS colour form works, alongside hex.
+This page is HTML, which takes every form.
 
 | Source | Renders as |
 | --- | --- |
@@ -45,6 +45,7 @@ Any CSS colour form works, alongside hex.
 : Accepted colour forms. {.striped .hover tbl-colwidths="[55,45]"}
 
 An invalid value is skipped with a warning rather than written out.
+Other formats are narrower, and Typst narrower still: the [Reference](reference.qmd#colour-values) gives the form to reach for in a document that renders to more than one.
 
 ## Blocks
 
@@ -127,7 +128,18 @@ color:
 [Primary highlight]{bg="primary"}
 ```
 
-The same names then follow a light and dark brand pair, and HTML switches between them with the theme.
+This site's brand names its palette after the pastels it is drawn with, so the same syntax reaches those:
+
+| Source | Renders as |
+| --- | --- |
+| `[On mint]{bg="mint"}` | [On mint]{bg="mint"} |
+| `[Coral text]{fg="coral-deep"}` | [Coral text]{fg="coral-deep"} |
+| `[Sage on paper]{fg="sage-deep" bg="paper" bc="sage"}` | [Sage on paper]{fg="sage-deep" bg="paper" bc="sage"} |
+
+: Brand colour names from the site's own `_brand.yml`. {.striped .hover tbl-colwidths="[55,45]"}
+
+A brand colour is resolved by the filter rather than by the browser, so the name reaches every format, Typst included.
+Given a light and dark brand pair, the same names follow both, and HTML switches between them with the theme.
 
 ## Other formats
 
