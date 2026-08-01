@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Documentation
+
+- docs: Add a documentation website under `docs/`, built on the `atelier` project type and published to <https://m.canouil.dev/quarto-highlight-text/>.
+- docs: Trim `README.md` to a landing page pointing at the website, and `example.qmd` to a short starting point to copy.
+- docs: Add the Pages workflow, which renders `docs/` on pull requests and deploys it from the release tag.
+- docs: Add the Quarto Extensions Updates workflow, scanning `docs` for the website's own dependencies.
+
+### Bug Fixes
+
+- fix: Anchor the `_quarto.yml` rule in `.gitignore` to the repository root. Unanchored, it also matched `docs/_quarto.yml`, which the documentation website and the release workflow's `docs/` detection both need.
+
 ## 2.3.0 (2026-05-31)
 
 ### New Features
