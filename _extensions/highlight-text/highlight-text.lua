@@ -27,6 +27,25 @@ local function is_css_var(value)
 end
 
 --- Resolve a colour reference to a concrete colour value.
+--- Convert a colour reference to a 6-character hex (without leading "#").
+--- Brand-resolved values are already concrete; this normalises hex (3 or 6 digits) and named colours.
+--- Returns nil for values that cannot be expressed as a hex code (rgb(), hsl(), CSS var(), Typst rgb()).
+--- @param colour string|nil The colour value
+--- @return string|nil A 6-character hex string without "#", or nil when not expressible as hex
+local function to_hex6(colour)
+  if colour == nil then return nil end
+  if colour_utils.is_named_colour(colour) then
+    return colour_utils.named_to_HTML(colour):gsub('^#', '')
+  end
+  if colour:match('^#%x%x%x%x%x%x$') then
+    return colour:sub(2)
+  end
+  if colour:match('^#%x%x%x$') then
+    return colour_utils.expand_hex_colour(colour):gsub('^#', '')
+  end
+  return nil
+end
+
 --- Brand colour names are resolved via the Quarto brand API.
 --- CSS `var()` references are preserved for HTML output.
 --- Hex/CSS colour values are validated.
@@ -68,8 +87,21 @@ local function get_brand_colour(theme, colour, attribute)
     return brand_colour
   end
 
+  -- Typst's `rgb()` takes a hex string, so a value has to be expressible as one
+  -- before it can be wrapped. Anything else is skipped with a warning, as it is
+  -- in every other format, rather than reaching the Typst compiler and failing
+  -- the whole render.
   if FORMAT:match('typst') then
-    return 'rgb("' .. colour .. '")'
+    local hex = to_hex6(colour)
+    if hex ~= nil then
+      return 'rgb("#' .. hex .. '")'
+    end
+    log.log_warning(
+      EXTENSION_NAME,
+      'Ignoring ' .. attribute .. ' value "' .. colour .. '" for Typst output: ' ..
+      'not convertible to a hex code.'
+    )
+    return nil
   end
 
   if colour:match('^#') or colour:match('^rgb') or colour:match('^hsl') or colour:match('^hwb')
@@ -83,25 +115,6 @@ local function get_brand_colour(theme, colour, attribute)
     'expected a hex (#RGB/#RRGGBB), CSS function (rgb/hsl/hwb), named colour, ' ..
     'CSS var(), or brand colour name.'
   )
-  return nil
-end
-
---- Convert a colour reference to a 6-character hex (without leading "#") for LaTeX/Word/PowerPoint.
---- Brand-resolved values are already concrete; this normalises hex (3 or 6 digits) and named colours.
---- Returns nil for values that cannot be expressed as a hex code (rgb(), hsl(), CSS var(), Typst rgb()).
---- @param colour string|nil The colour value
---- @return string|nil A 6-character hex string without "#", or nil when not expressible as hex
-local function to_hex6(colour)
-  if colour == nil then return nil end
-  if colour_utils.is_named_colour(colour) then
-    return colour_utils.named_to_HTML(colour):gsub('^#', '')
-  end
-  if colour:match('^#%x%x%x%x%x%x$') then
-    return colour:sub(2)
-  end
-  if colour:match('^#%x%x%x$') then
-    return colour_utils.expand_hex_colour(colour):gsub('^#', '')
-  end
   return nil
 end
 
