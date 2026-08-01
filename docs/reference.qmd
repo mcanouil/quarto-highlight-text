@@ -48,7 +48,7 @@ Where several spellings of the same attribute are given, the first in the alias 
 | --- | --- | --- |
 | Hex | `#b22222`, `#abc` | Every format. Three or six digits. |
 | Brand colour | `red`, `primary` | Every format. A name from the `color.palette` or the role names in `_brand.yml`. |
-| CSS named | `firebrick` | Every format except Typst. |
+| CSS named | `firebrick` | Every format. Converted to a hex code for Typst and the binary writers. |
 | CSS functional | `rgb(178 34 34)`, `hsl(0 71% 42%)`, `hwb(0 13% 30%)` | HTML and RevealJS. |
 | CSS custom property | `var(--brand-primary)` | HTML and RevealJS. Resolved by the browser rather than by the filter. |
 
@@ -56,13 +56,9 @@ Where several spellings of the same attribute are given, the first in the alias 
 
 LaTeX, Word, and PowerPoint need a colour they can write as a hex triplet, so a value they cannot convert is dropped with a warning and the rest of the styling is written without it.
 
-In HTML, LaTeX, Word, and PowerPoint an unrecognised colour is skipped with a warning rather than written out, so a typo cannot produce malformed LaTeX or broken CSS.
+An unrecognised colour is skipped with a warning rather than written out, so a typo cannot produce malformed output in any format.
 
-::: {.callout-caution}
-Typst is the exception, in both directions.
-It takes hex and brand colours only, and anything else is written as `rgb("…")`, which Typst rejects: a CSS named colour, a CSS functional colour, or a typo stops the render with `color string contains non-hexadecimal letters` rather than being skipped.
-Keep to hex or brand names in a document that renders to Typst.
-:::
+Typst takes a hex code, so a value is converted to one before it is written: a hex code of either length, a brand colour, and a CSS named colour all work, while a CSS functional colour cannot be expressed that way and is skipped with a warning.
 
 ### Brand colours
 
