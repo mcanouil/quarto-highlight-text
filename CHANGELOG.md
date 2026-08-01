@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.3.1 (2026-08-01)
+
 ### Bug Fixes
 
 - fix: Validate a colour before writing it for Typst. A CSS named colour, a CSS functional colour, or a typo was wrapped as `rgb("…")` and reached the compiler, stopping the render with `color string contains non-hexadecimal letters`. A value is now converted to a hex code first, so a named colour works as it does elsewhere, and anything that cannot be expressed as hex is skipped with a warning like every other format.
