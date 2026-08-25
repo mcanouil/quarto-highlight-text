@@ -1,4 +1,4 @@
---- @module highlight-text
+--- @module "highlight-text"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
