@@ -7,8 +7,8 @@
 local EXTENSION_NAME = "highlight-text"
 
 --- Load modules
-local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
-local colour_utils = require(quarto.utils.resolve_path('_modules/colour.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
+local colour_utils = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/colour.lua'):gsub('%.lua$', ''))
 
 --- Flag to track if deprecation warning has been shown
 --- @type boolean
