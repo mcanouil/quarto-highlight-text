@@ -20,9 +20,15 @@ website:
   title: "Highlight Text"
   description: "A Quarto filter that colours text, backgrounds, and borders across HTML, LaTeX, Typst, Word, PowerPoint, RevealJS, and Beamer."
   # No trailing slash: Quarto builds the social image URL by concatenating this
-  # with a leading-slash image path, without normalising.
+  # with the image path, without normalising.
   site-url: &site-url https://m.canouil.dev/quarto-highlight-text
   repo-url: https://github.com/mcanouil/quarto-highlight-text
+  open-graph:
+    image: assets/social/og-image.png
+    image-alt: "The quarto-highlight-text social card: the extension name and the \"filter\" badge over the line \"Highlight text with custom colours across all formats\", beside a dark code window showing document.qmd."
+  twitter-card:
+    image: assets/social/og-image.png
+    image-alt: "The quarto-highlight-text social card: the extension name and the \"filter\" badge over the line \"Highlight text with custom colours across all formats\", beside a dark code window showing document.qmd."
   # The Quarto project root is docs/, not the repository root, so the edit and
   # issue links have to be told where the pages actually live.
   repo-subdir: docs
