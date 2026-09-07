@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+- docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#87)
+
 ## 2.3.1 (2026-08-01)
 
 ### Bug Fixes
