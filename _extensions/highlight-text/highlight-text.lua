@@ -9,6 +9,21 @@ local EXTENSION_NAME = "highlight-text"
 --- Load modules
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local colour_utils = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/colour.lua'):gsub('%.lua$', ''))
+local schema = require(quarto.utils.resolve_path('_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', ''))
+local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', ''))
+
+--- The schema check, built once and reused by every element.
+---
+--- The validator is injected rather than required by the check module, so the
+--- two vendored sources stay independent of where the other was placed.
+---
+--- The extension declares an `attributes` section and no options, so the check
+--- runs per element rather than from a `Meta` pass. The schema's group is
+--- `_any`, which every element takes, so no group is named here.
+---
+--- A schema that cannot be read is reported by the module as an error and the
+--- render carries on: a configuration file must not stop a document.
+local checker = check.new(schema, EXTENSION_NAME)
 
 --- Flag to track if deprecation warning has been shown
 --- @type boolean
@@ -984,6 +999,9 @@ end
 --- @param span table The span element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
+  -- Checked before the aliases are stripped, so the schema sees what the
+  -- document wrote. The resolved table is what `par` is read from below.
+  local checked = checker:attributes(span.attributes)
   local colour, bg_colour, border_colour, border_style = get_colour_attributes(span.attributes)
   local opacity = parse_opacity(span.attributes['opacity'])
   local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style, opacity, nil)
@@ -1001,7 +1019,11 @@ local function highlight(span)
     return span
   end
 
-  local par = span.attributes['par'] ~= nil
+  -- The schema declares `par` a boolean, so its value decides. Reading presence
+  -- alone meant `par="false"` turned it on as surely as `par="true"` did. A bare
+  -- `par` cannot reach here: Pandoc does not parse an attribute without a value,
+  -- so the word is left as text and no span is made.
+  local par = checked ~= nil and checked['par'] == true
   strip_alias_attributes(span.attributes)
 
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
