@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: Check an element's attributes against the schema during a render, so a value the schema does not accept is reported instead of ignored. A `border-style` outside the four it declares now says so. (#89)
+
+### Bug Fixes
+
+- fix: Read `par` as the boolean the schema declares. It was read as present or absent, so `par="false"` turned paragraph box wrapping on rather than off. (#89)
+
 ### Documentation
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#87)
@@ -9,6 +17,7 @@
 ### Refactoring
 
 - build: Update the vendored Lua modules to 2.3.0. A module no longer carries a version line in its header, so its checksum changes only when its code changes. (#88)
+- build: Update the vendored Lua modules to 2.5.0, which adds the accessors that read what the schema resolves an option, an element's attributes and a format's options to. The schema validator moves to its own release train and is pinned at `schema-v2.1.0`, which accepts only `true` and `false` as a boolean. (#89)
 
 ## 2.3.1 (2026-08-01)
 
