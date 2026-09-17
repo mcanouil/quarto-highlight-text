@@ -40,7 +40,7 @@ Each has several spellings, so a document can keep whichever reads best.
 : Attributes accepted on a span or a div. {.striped .hover tbl-colwidths="[15,28,57]"}
 
 Where several spellings of the same attribute are given, the first in the alias list above wins.
-`par` is a boolean, so `par="false"` turns it off and `par="true"` turns it on. Pandoc needs a value here: an attribute written without one is not parsed, and the span is left as text.
+A boolean attribute needs a value. Pandoc does not parse an attribute written without one, so the span is left as text.
 
 ## Colour values
 
