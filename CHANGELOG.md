@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.3.2 (2026-09-23)
+
 ### New Features
 
 - feat: Check an element's attributes against the schema during a render, so a value the schema does not accept is reported instead of ignored. A `border-style` outside the four it declares now says so. (#89)
