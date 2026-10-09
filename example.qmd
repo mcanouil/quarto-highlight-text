@@ -81,6 +81,12 @@ execute:
   echo: true
 filters:
   - highlight-text
+extensions:
+  highlight-text:
+    styles:
+      alert:
+        fg: "#ffffff"
+        bg: "#b22222"
 brand:
   light:
     color:
@@ -119,5 +125,13 @@ A block with white text on a red background.
 :::
 
 `ink` and `paper` are aliases of `fg` and `bg`, and a colour may be a hex code, a CSS colour, or a name from `_brand.yml`.
+
+Name a set of attributes once under `extensions.highlight-text.styles` in the front matter, then reuse it as a class.
+
+```markdown
+[Named style]{.alert}
+```
+
+[Named style]{.alert}
 
 Full documentation: <https://m.canouil.dev/quarto-highlight-text/>.

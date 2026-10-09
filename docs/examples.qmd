@@ -1,7 +1,16 @@
 ---
 title: "Examples"
 subtitle: "Every attribute, rendered."
-description: "Text, background, border, opacity, and gradient highlighting produced by the extension, with the source alongside each."
+description: "Text, background, border, opacity, gradient, and named style highlighting produced by the extension, with the source alongside each."
+extensions:
+  highlight-text:
+    styles:
+      alert:
+        fg: "#ffffff"
+        bg: "#b22222"
+      boxed:
+        bc: "#0000ff"
+        bs: dashed
 ---
 
 Everything below is coloured by the filter as this page is rendered.
@@ -140,6 +149,32 @@ This site's brand names its palette after the pastels it is drawn with, so the s
 
 A brand colour is resolved by the filter rather than by the browser, so the name reaches every format, Typst included.
 Given a light and dark brand pair, the same names follow both, and HTML switches between them with the theme.
+
+## Named styles
+
+This page defines two styles in its front matter:
+
+```yaml
+extensions:
+  highlight-text:
+    styles:
+      alert:
+        fg: "#ffffff"
+        bg: "#b22222"
+      boxed:
+        bc: "#0000ff"
+        bs: dashed
+```
+
+| Source | Renders as |
+| --- | --- |
+| `[Alert]{.alert}` | [Alert]{.alert} |
+| `[Alert on black]{.alert bg="#000000"}` | [Alert on black]{.alert bg="#000000"} |
+| `[Alert in a box]{.alert .boxed}` | [Alert in a box]{.alert .boxed} |
+
+: Named styles, an attribute that overrides one, and two styles merged. {.striped .hover tbl-colwidths="[55,45]"}
+
+The [Reference](reference.qmd#named-styles) gives the merge rules.
 
 ## Other formats
 

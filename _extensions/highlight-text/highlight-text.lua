@@ -12,14 +12,29 @@ local colour_utils = require(quarto.utils.resolve_path('_vendor/quarto-lua-modul
 local schema = require(quarto.utils.resolve_path('_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', ''))
 local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', ''))
 
+--- Every attribute the filter reads, with the spellings it accepts.
+---
+--- The spellings are listed in order of precedence: when an element carries
+--- more than one of them, the first one present wins.
+--- @type table<integer, {name: string, spellings: string[]}>
+local ATTRIBUTE_SPELLINGS = {
+  { name = 'colour', spellings = { 'ink', 'fg', 'colour', 'color' } },
+  { name = 'bg-colour', spellings = { 'paper', 'bg', 'bg-colour', 'bg-color' } },
+  { name = 'border-colour', spellings = { 'bc', 'border-colour', 'border-color' } },
+  { name = 'border-style', spellings = { 'bs', 'border-style' } },
+  { name = 'par', spellings = { 'par' } },
+  { name = 'opacity', spellings = { 'opacity' } },
+  { name = 'gradient', spellings = { 'gradient' } },
+}
+
 --- The schema check, built once and reused by every element.
 ---
 --- The validator is injected rather than required by the check module, so the
 --- two vendored sources stay independent of where the other was placed.
 ---
---- The extension declares an `attributes` section and no options, so the check
---- runs per element rather than from a `Meta` pass. The schema's group is
---- `_any`, which every element takes, so no group is named here.
+--- The `styles` option is checked once from the `Meta` pass, and the
+--- `attributes` section per element. The schema's attribute group is `_any`,
+--- which every element takes, so no group is named here.
 ---
 --- A schema that cannot be read is reported by the module as an error and the
 --- render carries on: a configuration file must not stop a document.
@@ -32,6 +47,11 @@ local deprecation_warning_shown = false
 --- Flag to track if the PowerPoint border-discard warning has been shown
 --- @type boolean
 local pptx_border_warning_shown = false
+
+--- Named styles from `extensions.highlight-text.styles`, keyed by class name.
+--- Each style maps canonical attribute names to string values.
+--- @type table<string, table<string, string>>
+local styles = {}
 
 --- Check whether a string looks like a CSS custom property reference (e.g. "var(--brand-primary)").
 --- @param value string|nil The value to inspect
@@ -354,15 +374,10 @@ end
 --- Strip every input-alias attribute consumed by the filter so they do not leak to output.
 --- @param attributes table The element attributes (mutated in place)
 local function strip_alias_attributes(attributes)
-  local aliases = {
-    'ink', 'fg', 'colour', 'color',
-    'paper', 'bg', 'bg-colour', 'bg-color',
-    'bc', 'border-colour', 'border-color',
-    'bs', 'border-style',
-    'par', 'opacity', 'gradient'
-  }
-  for _, name in ipairs(aliases) do
-    attributes[name] = nil
+  for _, attribute in ipairs(ATTRIBUTE_SPELLINGS) do
+    for _, spelling in ipairs(attribute.spellings) do
+      attributes[spelling] = nil
+    end
   end
 end
 
@@ -946,6 +961,22 @@ local function highlight_typst_block(div, colour, bg_colour, border_colour, bord
   return div.content
 end
 
+--- Resolves every accepted spelling to its canonical attribute name.
+--- @param attributes table The attributes, keyed by any accepted spelling
+--- @return table<string, string> canonical The values keyed by canonical name
+local function canonical_attributes(attributes)
+  local canonical = {}
+  for _, attribute in ipairs(ATTRIBUTE_SPELLINGS) do
+    for _, spelling in ipairs(attribute.spellings) do
+      if attributes[spelling] ~= nil then
+        canonical[attribute.name] = attributes[spelling]
+        break
+      end
+    end
+  end
+  return canonical
+end
+
 --- Extracts colour attributes from element attributes.
 --- @param attributes table The element attributes
 --- @return string|nil colour The foreground colour
@@ -953,11 +984,65 @@ end
 --- @return string|nil border_colour The border colour
 --- @return string|nil border_style The border style
 local function get_colour_attributes(attributes)
-  local colour = attributes['ink'] or attributes['fg'] or attributes['colour'] or attributes['color']
-  local bg_colour = attributes['paper'] or attributes['bg'] or attributes['bg-colour'] or attributes['bg-color']
-  local border_colour = attributes['bc'] or attributes['border-colour'] or attributes['border-color']
-  local border_style = attributes['bs'] or attributes['border-style']
-  return colour, bg_colour, border_colour, border_style
+  local canonical = canonical_attributes(attributes)
+  return canonical['colour'], canonical['bg-colour'], canonical['border-colour'], canonical['border-style']
+end
+
+--- Reads the named styles from `extensions.highlight-text.styles`.
+---
+--- The schema check reports a malformed definition. Here a definition that is
+--- not a map is skipped, and an unknown key inside one is dropped.
+--- @param meta table The document metadata
+local function load_styles(meta)
+  checker:options(meta)
+  local extension_meta = meta['extensions'] and meta['extensions'][EXTENSION_NAME]
+  local definitions = extension_meta and extension_meta['styles']
+  if pandoc.utils.type(definitions) ~= 'table' then
+    return
+  end
+  for name, definition in pairs(definitions) do
+    if pandoc.utils.type(definition) == 'table' then
+      local values = {}
+      for key, value in pairs(definition) do
+        values[key] = type(value) == 'boolean' and tostring(value) or pandoc.utils.stringify(value)
+      end
+      styles[name] = canonical_attributes(values)
+    end
+  end
+end
+
+--- Replaces the style classes of an element with the attributes they define.
+---
+--- Styles merge in class order, so a later class wins, and the element's own
+--- attributes win over every style.
+--- @param element table The span or div (mutated in place)
+local function apply_styles(element)
+  local merged = {}
+  local remaining = pandoc.List()
+  local matched = false
+  for _, class in ipairs(element.classes) do
+    local style = styles[class]
+    if style == nil then
+      remaining:insert(class)
+    else
+      matched = true
+      for name, value in pairs(style) do
+        merged[name] = value
+      end
+    end
+  end
+  if not matched then
+    return
+  end
+
+  for name, value in pairs(canonical_attributes(element.attributes)) do
+    merged[name] = value
+  end
+  element.classes = remaining
+  strip_alias_attributes(element.attributes)
+  for name, value in pairs(merged) do
+    element.attributes[name] = value
+  end
 end
 
 --- Processes colour settings for light and dark themes.
@@ -1012,6 +1097,7 @@ end
 --- @param span table The span element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
+  apply_styles(span)
   -- Checked before the aliases are stripped, so the schema sees what the
   -- document wrote. The resolved table is what `par` is read from below.
   local checked = checker:attributes(span.attributes)
@@ -1059,6 +1145,7 @@ end
 --- @param div table The div element from the document
 --- @return table The modified div or div content with appropriate styling
 local function highlight_block(div)
+  apply_styles(div)
   local colour, bg_colour, border_colour, border_style = get_colour_attributes(div.attributes)
   local opacity = parse_opacity(div.attributes['opacity'])
   local gradient = parse_gradient(div.attributes['gradient'])
@@ -1123,6 +1210,7 @@ local function keep_identifier(handler, constructor)
 end
 
 return {
+  { Meta = load_styles },
   { Span = keep_identifier(highlight, pandoc.Span) },
   { Div = keep_identifier(highlight_block, pandoc.Div) },
 }

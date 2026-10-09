@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: Define named styles under `extensions.highlight-text.styles` and apply them with a class, such as `[text]{.alert}`. Several style classes merge in order, and attributes on the element still win.
+
 ### Bug Fixes
 
 - fix: Keep the identifier of a highlighted element in HTML, LaTeX, Typst, and Word, so a link to it still works. HTML also keeps the classes and attributes of the element. (#93)
