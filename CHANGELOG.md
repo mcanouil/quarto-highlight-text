@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- fix: Keep the identifier of a highlighted element in every format, so a link to it still works. HTML also keeps the classes of the element.
+- fix: Keep the identifier of a highlighted element in HTML, LaTeX, Typst, and Word, so a link to it still works. HTML also keeps the classes and attributes of the element.
 
 ## 2.3.2 (2026-09-23)
 

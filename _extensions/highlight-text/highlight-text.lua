@@ -369,10 +369,11 @@ end
 --- Applies HTML styling to an element.
 --- Handles foreground, background, border, opacity, and (for blocks) gradient fills.
 ---
---- The identifier and classes of the element go on one element only: the
---- styled copy when there is one theme, or a wrapper around the light and
---- dark copies. A class such as `.fragment` then acts once, and the
---- identifier stays unique.
+--- The identifier, classes and attributes of the element go on one element
+--- only: the styled copy when there is one theme, or a wrapper around the
+--- light and dark copies. A class such as `.fragment` then acts once, next to
+--- its `data-fragment-index`, and the identifier stays unique. Each copy keeps
+--- the `style` attribute, which it extends.
 --- @param element table The element to style
 --- @param settings table The highlight settings keyed by theme (light/dark)
 --- @param is_block boolean Whether this is a block-level element
@@ -397,9 +398,7 @@ local function apply_html_styling(element, settings, is_block, constructor)
     local opacity = settings[theme].opacity
     local gradient = settings[theme].gradient
 
-    for k, v in pairs(element.attributes) do
-      themed_element.attributes[k] = v
-    end
+    themed_element.attributes['style'] = element.attributes['style']
 
     if themed_element.attributes['style'] == nil then
       themed_element.attributes['style'] = ''
@@ -408,8 +407,6 @@ local function apply_html_styling(element, settings, is_block, constructor)
     end
 
     themed_element.classes = { theme .. '-content' }
-
-    strip_alias_attributes(themed_element.attributes)
 
     if colour ~= nil then
       themed_element.attributes['style'] = themed_element.attributes['style'] .. 'color: ' .. colour .. ';'
@@ -440,13 +437,23 @@ local function apply_html_styling(element, settings, is_block, constructor)
     table.insert(result, themed_element)
   end
 
+  local carried = {}
+  for key, value in pairs(element.attributes) do
+    if key ~= 'style' then
+      carried[key] = value
+    end
+  end
+
   if #result == 1 then
     local styled = result[1]
     styled.identifier = element.identifier
     styled.classes = element.classes .. styled.classes
+    for key, value in pairs(carried) do
+      styled.attributes[key] = value
+    end
     return styled
   end
-  return constructor(result, pandoc.Attr(element.identifier, element.classes))
+  return constructor(result, pandoc.Attr(element.identifier, element.classes, carried))
 end
 
 --- Applies text and background colour styling for HTML-based outputs.
