@@ -77,6 +77,7 @@ A block.
 - When an element has more than one style class, the styles merge in class order, and a later class wins.
 - An attribute on the element wins over the same attribute in a style.
 - The filter removes each style class from the output, so the result is the same as when the element carries the attributes itself.
+- Other classes on the element stay in the output.
 - A class with no matching style does not change.
 
 A style takes over any class with the same name.
