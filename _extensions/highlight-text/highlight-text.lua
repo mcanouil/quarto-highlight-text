@@ -1106,7 +1106,7 @@ end
 ---
 --- The format writers rebuild the element from its content, which drops the
 --- identifier. A wrapper that carries only the identifier keeps links to it
---- working in every format. HTML output already carries the identifier, so it
+--- working in LaTeX, Typst, and Word. PowerPoint has no anchor for it. HTML output already carries the identifier, so it
 --- is returned as it is.
 --- @param handler function The filter function for one element type
 --- @param constructor any The Pandoc constructor (pandoc.Span or pandoc.Div)
