@@ -29,17 +29,17 @@ Each has several spellings, so a document can keep whichever reads best.
 
 | Attribute | Aliases | Description |
 | --- | --- | --- |
-| Foreground | `ink`, `fg`, `colour`, `color` | Text colour. |
-| Background | `paper`, `bg`, `bg-colour`, `bg-color` | Background colour. |
-| Border colour | `bc`, `border-colour`, `border-color` | Border colour. Drawing a border needs this attribute. |
-| Border style | `bs`, `border-style` | `solid`, `dashed`, `dotted`, or `double`. Defaults to `solid`. |
+| Foreground | `colour`, `color`, `ink`, `fg` | Text colour. |
+| Background | `bg-colour`, `bg-color`, `bg`, `paper` | Background colour. |
+| Border colour | `border-colour`, `border-color`, `bc` | Border colour. Drawing a border needs this attribute. |
+| Border style | `border-style`, `bs` | `solid`, `dashed`, `dotted`, or `double`. Defaults to `solid`. |
 | Opacity | `opacity` | A number from `0` to `1`, or a percentage such as `"50%"`. Applied to the background when there is one, otherwise to the whole element. |
 | Gradient | `gradient` | A full `linear-gradient(...)` or `radial-gradient(...)`, or a comma-separated list of colour stops, which becomes a left-to-right linear gradient. Blocks only. |
 | Line wrapping | `par` | LaTeX only, and on a span only. Wraps inline highlighted text in a `\parbox` so it can break across lines. |
 
 : Attributes accepted on a span or a div. {.striped .hover tbl-colwidths="[15,28,57]"}
 
-Where several spellings of the same attribute are given, the first in the alias list above wins.
+Where several spellings of the same attribute are given, the first in the alias list above wins, and the render warns which one it used.
 A boolean attribute needs a value. Pandoc does not parse an attribute written without one, so the span is left as text.
 
 ## Named styles
