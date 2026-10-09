@@ -402,8 +402,8 @@ local function apply_html_styling(element, settings, is_block, constructor)
       themed_element.attributes['style'] = themed_element.attributes['style'] .. ';'
     end
 
-    themed_element.classes = themed_element.classes or {}
-    table.insert(themed_element.classes, theme .. '-content')
+    themed_element.classes = element.classes:clone()
+    themed_element.classes:insert(theme .. '-content')
 
     strip_alias_attributes(themed_element.attributes)
 
@@ -1089,7 +1089,27 @@ local function highlight_block(div)
   end
 end
 
+--- Wraps a filter function so the element's identifier survives the rewrite.
+---
+--- The format writers rebuild the element from its content, which drops the
+--- identifier. A wrapper that carries only the identifier keeps links to it
+--- working in every format. In HTML it also gives one anchor to the light and
+--- dark copies, instead of a duplicate identifier on each.
+--- @param handler function The filter function for one element type
+--- @param constructor any The Pandoc constructor (pandoc.Span or pandoc.Div)
+--- @return function handler The filter function that keeps the identifier
+local function keep_identifier(handler, constructor)
+  return function(element)
+    local identifier = element.identifier
+    local result = handler(element)
+    if identifier == '' or result == element then
+      return result
+    end
+    return constructor(result, pandoc.Attr(identifier))
+  end
+end
+
 return {
-  { Span = highlight },
-  { Div = highlight_block },
+  { Span = keep_identifier(highlight, pandoc.Span) },
+  { Div = keep_identifier(highlight_block, pandoc.Div) },
 }
