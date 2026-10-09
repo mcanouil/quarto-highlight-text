@@ -1102,7 +1102,7 @@ local function keep_identifier(handler, constructor)
   return function(element)
     local identifier = element.identifier
     local result = handler(element)
-    if identifier == '' or result == element then
+    if identifier == '' or rawequal(result, element) then
       return result
     end
     return constructor(result, pandoc.Attr(identifier))
