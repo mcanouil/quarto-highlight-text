@@ -15,13 +15,17 @@ local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/sche
 --- Every attribute the filter reads, with the spellings it accepts.
 ---
 --- The spellings are listed in order of precedence: when an element carries
---- more than one of them, the first one present wins.
+--- more than one of them, the first one present wins. The order is the one the
+--- schema check uses, the name first and then the aliases as `_schema.yml`
+--- lists them, so its warning names the value the filter applies. The check
+--- also accepts the underscore form of a hyphenated spelling, read just after
+--- it, so the filter lists those forms in the same place.
 --- @type table<integer, {name: string, spellings: string[]}>
 local ATTRIBUTE_SPELLINGS = {
-  { name = 'colour', spellings = { 'ink', 'fg', 'colour', 'color' } },
-  { name = 'bg-colour', spellings = { 'paper', 'bg', 'bg-colour', 'bg-color' } },
-  { name = 'border-colour', spellings = { 'bc', 'border-colour', 'border-color' } },
-  { name = 'border-style', spellings = { 'bs', 'border-style' } },
+  { name = 'colour', spellings = { 'colour', 'color', 'ink', 'fg' } },
+  { name = 'bg-colour', spellings = { 'bg-colour', 'bg_colour', 'bg-color', 'bg_color', 'bg', 'paper' } },
+  { name = 'border-colour', spellings = { 'border-colour', 'border_colour', 'border-color', 'border_color', 'bc' } },
+  { name = 'border-style', spellings = { 'border-style', 'border_style', 'bs' } },
   { name = 'par', spellings = { 'par' } },
   { name = 'opacity', spellings = { 'opacity' } },
   { name = 'gradient', spellings = { 'gradient' } },
@@ -1156,6 +1160,7 @@ end
 --- @param div table The div element from the document
 --- @return table The modified div or div content with appropriate styling
 local function highlight_block(div)
+  checker:attributes(div.attributes)
   apply_styles(div)
   local colour, bg_colour, border_colour, border_style = get_colour_attributes(div.attributes)
   local opacity = parse_opacity(div.attributes['opacity'])

@@ -10,6 +10,9 @@
 
 - fix: Keep the identifier of a highlighted element in HTML, LaTeX, Typst, and Word, so a link to it still works. HTML also keeps the classes and attributes of the element. (#93)
 - fix: Remove the filter's own attributes from an element it does not style, such as `bs` without a border colour, so they no longer reach the output. (#94)
+- fix: Apply the spelling that the warning names when an element gives one attribute twice, such as `fg` and `colour`. The full name now wins over its aliases. (#95)
+- fix: Check the attributes of a div against the schema, as a span already was, so an invalid value on a div is reported. (#95)
+- fix: Read the underscore form of a hyphenated attribute, such as `bg_colour`, which the schema check already accepted but the filter ignored. (#95)
 
 ## 2.3.2 (2026-09-23)
 
