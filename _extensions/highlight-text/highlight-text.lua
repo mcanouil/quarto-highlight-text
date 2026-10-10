@@ -18,14 +18,14 @@ local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/sche
 --- more than one of them, the first one present wins. The order is the one the
 --- schema check uses, the name first and then the aliases as `_schema.yml`
 --- lists them, so its warning names the value the filter applies. The check
---- also accepts underscore forms such as `bg_colour`, which the filter does not
---- read.
+--- also accepts the underscore form of a hyphenated spelling, read just after
+--- it, so the filter lists those forms in the same place.
 --- @type table<integer, {name: string, spellings: string[]}>
 local ATTRIBUTE_SPELLINGS = {
   { name = 'colour', spellings = { 'colour', 'color', 'ink', 'fg' } },
-  { name = 'bg-colour', spellings = { 'bg-colour', 'bg-color', 'bg', 'paper' } },
-  { name = 'border-colour', spellings = { 'border-colour', 'border-color', 'bc' } },
-  { name = 'border-style', spellings = { 'border-style', 'bs' } },
+  { name = 'bg-colour', spellings = { 'bg-colour', 'bg_colour', 'bg-color', 'bg_color', 'bg', 'paper' } },
+  { name = 'border-colour', spellings = { 'border-colour', 'border_colour', 'border-color', 'border_color', 'bc' } },
+  { name = 'border-style', spellings = { 'border-style', 'border_style', 'bs' } },
   { name = 'par', spellings = { 'par' } },
   { name = 'opacity', spellings = { 'opacity' } },
   { name = 'gradient', spellings = { 'gradient' } },

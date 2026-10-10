@@ -40,6 +40,7 @@ Each has several spellings, so a document can keep whichever reads best.
 : Attributes accepted on a span or a div. {.striped .hover tbl-colwidths="[15,28,57]"}
 
 Where several spellings of the same attribute are given, the first in the alias list above wins, and the render warns which one it used.
+A hyphenated spelling also works with underscores, such as `bg_colour`, and comes just after the hyphenated form in that order.
 A boolean attribute needs a value. Pandoc does not parse an attribute written without one, so the span is left as text.
 
 ## Named styles
