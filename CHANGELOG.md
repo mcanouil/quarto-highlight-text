@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.4.0 (2026-10-10)
+
 ### New Features
 
 - feat: Define named styles under `extensions.highlight-text.styles` and apply them with a class, such as `[text]{.alert}`. Several style classes merge in order, and attributes on the element still win. (#94)
