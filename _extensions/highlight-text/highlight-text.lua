@@ -1103,10 +1103,11 @@ end
 --- @param span table The span element from the document
 --- @return table The modified span or span content with appropriate styling
 local function highlight(span)
-  apply_styles(span)
-  -- Checked before the aliases are stripped, so the schema sees what the
-  -- document wrote. The resolved table is what `par` is read from below.
+  -- Checked before the styles are applied and the aliases are stripped, so the
+  -- schema sees what the document wrote on the element. A style value was
+  -- already checked once from the `Meta` pass.
   local checked = checker:attributes(span.attributes)
+  apply_styles(span)
   local colour, bg_colour, border_colour, border_style = get_colour_attributes(span.attributes)
   local opacity = parse_opacity(span.attributes['opacity'])
   local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style, opacity, nil)
@@ -1130,7 +1131,9 @@ local function highlight(span)
   -- alone meant `par="false"` turned it on as surely as `par="true"` did. A bare
   -- `par` cannot reach here: Pandoc does not parse an attribute without a value,
   -- so the word is left as text and no span is made.
-  local par = checked ~= nil and checked['par'] == true
+  -- The element's own `par` was checked above. Without one, a style's value
+  -- applies, which `load_styles` wrote as "true" or "false".
+  local par = (checked ~= nil and checked['par'] == true) or span.attributes['par'] == 'true'
   strip_alias_attributes(span.attributes)
 
   if quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
