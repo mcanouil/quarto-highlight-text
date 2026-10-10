@@ -42,6 +42,50 @@ Each has several spellings, so a document can keep whichever reads best.
 Where several spellings of the same attribute are given, the first in the alias list above wins.
 A boolean attribute needs a value. Pandoc does not parse an attribute written without one, so the span is left as text.
 
+## Named styles
+
+A named style keeps a set of attributes under one class name.
+Define the styles under `extensions.highlight-text.styles`, in the front matter or in `_quarto.yml`:
+
+```yaml
+extensions:
+  highlight-text:
+    styles:
+      alert:
+        fg: "#ffffff"
+        bg: "#b22222"
+      boxed:
+        bc: primary
+        bs: dashed
+```
+
+Then apply a style with its class, on a span or on a div:
+
+```markdown
+[Danger]{.alert}
+
+[Danger on black]{.alert bg="black"}
+
+[Danger in a box]{.alert .boxed}
+
+::: {.alert}
+A block.
+:::
+```
+
+- A style accepts every attribute in the table above, with the same aliases and colour values.
+- When an element has more than one style class, the styles merge in class order, and a later class wins.
+- An attribute on the element wins over the same attribute in a style.
+- The filter removes each style class from the output, so the result is the same as when the element carries the attributes itself.
+- Other classes on the element stay in the output.
+- A class with no matching style does not change.
+
+A style takes over any class with the same name.
+For example, a style named `mark` replaces the yellow highlight that Pandoc gives to `.mark`.
+
+The schema check reports a style that is not a map, an unknown attribute in a style, and a style name that is not a valid class name.
+The render continues after each report.
+
 ## Colour values
 
 | Form | Example | Where it works |
