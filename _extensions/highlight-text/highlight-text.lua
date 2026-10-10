@@ -1019,19 +1019,17 @@ end
 local function apply_styles(element)
   local merged = {}
   local remaining = pandoc.List()
-  local matched = false
   for _, class in ipairs(element.classes) do
     local style = styles[class]
     if style == nil then
       remaining:insert(class)
     else
-      matched = true
       for name, value in pairs(style) do
         merged[name] = value
       end
     end
   end
-  if not matched then
+  if #remaining == #element.classes then
     return
   end
 
