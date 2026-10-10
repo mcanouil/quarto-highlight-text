@@ -1023,6 +1023,9 @@ end
 --- element's own spellings reach the schema check as written.
 --- @param element table The span or div (mutated in place)
 local function apply_styles(element)
+  if next(styles) == nil then
+    return
+  end
   local merged = {}
   local remaining = pandoc.List()
   for _, class in ipairs(element.classes) do
@@ -1109,6 +1112,7 @@ local function highlight(span)
   local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style, opacity, nil)
 
   if highlight_settings == nil then
+    strip_alias_attributes(span.attributes)
     return span
   end
 
@@ -1118,6 +1122,7 @@ local function highlight(span)
   border_style = highlight_settings.light.border_style
 
   if colour == nil and bg_colour == nil and border_colour == nil and opacity == nil then
+    strip_alias_attributes(span.attributes)
     return span
   end
 
@@ -1156,6 +1161,7 @@ local function highlight_block(div)
   local highlight_settings = process_highlight_settings(colour, bg_colour, border_colour, border_style, opacity, gradient)
 
   if highlight_settings == nil then
+    strip_alias_attributes(div.attributes)
     return div
   end
 
@@ -1165,6 +1171,7 @@ local function highlight_block(div)
   border_style = highlight_settings.light.border_style
 
   if colour == nil and bg_colour == nil and border_colour == nil and opacity == nil and gradient == nil then
+    strip_alias_attributes(div.attributes)
     return div
   end
 
