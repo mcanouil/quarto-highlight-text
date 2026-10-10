@@ -991,7 +991,8 @@ end
 --- Reads the named styles from `extensions.highlight-text.styles`.
 ---
 --- The schema check reports a malformed definition. Here a definition that is
---- not a map is skipped, and an unknown key inside one is dropped.
+--- not a map is skipped, and an unknown key inside one is dropped. A style left
+--- with no attribute is not registered, so its class stays on the element.
 --- @param meta table The document metadata
 local function load_styles(meta)
   checker:options(meta)
@@ -1006,7 +1007,10 @@ local function load_styles(meta)
       for key, value in pairs(definition) do
         values[key] = type(value) == 'boolean' and tostring(value) or pandoc.utils.stringify(value)
       end
-      styles[name] = canonical_attributes(values)
+      local resolved = canonical_attributes(values)
+      if next(resolved) ~= nil then
+        styles[name] = resolved
+      end
     end
   end
 end
@@ -1014,7 +1018,9 @@ end
 --- Replaces the style classes of an element with the attributes they define.
 ---
 --- Styles merge in class order, so a later class wins, and the element's own
---- attributes win over every style.
+--- attributes win over every style. A style value is added under its canonical
+--- name only where the element gives that attribute under no spelling, so the
+--- element's own spellings reach the schema check as written.
 --- @param element table The span or div (mutated in place)
 local function apply_styles(element)
   local merged = {}
@@ -1033,13 +1039,12 @@ local function apply_styles(element)
     return
   end
 
-  for name, value in pairs(canonical_attributes(element.attributes)) do
-    merged[name] = value
-  end
+  local own = canonical_attributes(element.attributes)
   element.classes = remaining
-  strip_alias_attributes(element.attributes)
   for name, value in pairs(merged) do
-    element.attributes[name] = value
+    if own[name] == nil then
+      element.attributes[name] = value
+    end
   end
 end
 
