@@ -17,7 +17,9 @@ local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/sche
 --- The spellings are listed in order of precedence: when an element carries
 --- more than one of them, the first one present wins. The order is the one the
 --- schema check uses, the name first and then the aliases as `_schema.yml`
---- lists them, so its warning names the value the filter applies.
+--- lists them, so its warning names the value the filter applies. The check
+--- also accepts underscore forms such as `bg_colour`, which the filter does not
+--- read.
 --- @type table<integer, {name: string, spellings: string[]}>
 local ATTRIBUTE_SPELLINGS = {
   { name = 'colour', spellings = { 'colour', 'color', 'ink', 'fg' } },
