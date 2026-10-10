@@ -368,11 +368,17 @@ end
 
 --- Applies HTML styling to an element.
 --- Handles foreground, background, border, opacity, and (for blocks) gradient fills.
+---
+--- The identifier, classes and attributes of the element go on one element
+--- only: the styled copy when there is one theme, or a wrapper around the
+--- light and dark copies. A class such as `.fragment` then acts once, next to
+--- its `data-fragment-index`, and the identifier stays unique. Each copy keeps
+--- the `style` attribute, which it extends.
 --- @param element table The element to style
 --- @param settings table The highlight settings keyed by theme (light/dark)
 --- @param is_block boolean Whether this is a block-level element
 --- @param constructor any The Pandoc constructor (pandoc.Span or pandoc.Div)
---- @return table The styled element(s)
+--- @return table The styled element
 local function apply_html_styling(element, settings, is_block, constructor)
   local result = {}
   local theme_keys = {}
@@ -392,9 +398,7 @@ local function apply_html_styling(element, settings, is_block, constructor)
     local opacity = settings[theme].opacity
     local gradient = settings[theme].gradient
 
-    for k, v in pairs(element.attributes) do
-      themed_element.attributes[k] = v
-    end
+    themed_element.attributes['style'] = element.attributes['style']
 
     if themed_element.attributes['style'] == nil then
       themed_element.attributes['style'] = ''
@@ -402,10 +406,7 @@ local function apply_html_styling(element, settings, is_block, constructor)
       themed_element.attributes['style'] = themed_element.attributes['style'] .. ';'
     end
 
-    themed_element.classes = themed_element.classes or {}
-    table.insert(themed_element.classes, theme .. '-content')
-
-    strip_alias_attributes(themed_element.attributes)
+    themed_element.classes = { theme .. '-content' }
 
     if colour ~= nil then
       themed_element.attributes['style'] = themed_element.attributes['style'] .. 'color: ' .. colour .. ';'
@@ -436,11 +437,23 @@ local function apply_html_styling(element, settings, is_block, constructor)
     table.insert(result, themed_element)
   end
 
-  if #result == 1 then
-    return result[1]
-  else
-    return result
+  local carried = {}
+  for key, value in pairs(element.attributes) do
+    if key ~= 'style' then
+      carried[key] = value
+    end
   end
+
+  if #result == 1 then
+    local styled = result[1]
+    styled.identifier = element.identifier
+    styled.classes = element.classes .. styled.classes
+    for key, value in pairs(carried) do
+      styled.attributes[key] = value
+    end
+    return styled
+  end
+  return constructor(result, pandoc.Attr(element.identifier, element.classes, carried))
 end
 
 --- Applies text and background colour styling for HTML-based outputs.
@@ -1089,7 +1102,27 @@ local function highlight_block(div)
   end
 end
 
+--- Wraps a filter function so the element's identifier survives the rewrite.
+---
+--- The format writers rebuild the element from its content, which drops the
+--- identifier. A wrapper that carries only the identifier keeps links to it
+--- working in LaTeX, Typst, and Word. PowerPoint has no anchor for it. HTML output already carries the identifier, so it
+--- is returned as it is.
+--- @param handler function The filter function for one element type
+--- @param constructor any The Pandoc constructor (pandoc.Span or pandoc.Div)
+--- @return function handler The filter function that keeps the identifier
+local function keep_identifier(handler, constructor)
+  return function(element)
+    local identifier = element.identifier
+    local result = handler(element)
+    if identifier == '' or rawequal(result, element) or result.identifier == identifier then
+      return result
+    end
+    return constructor(result, pandoc.Attr(identifier))
+  end
+end
+
 return {
-  { Span = highlight },
-  { Div = highlight_block },
+  { Span = keep_identifier(highlight, pandoc.Span) },
+  { Div = keep_identifier(highlight_block, pandoc.Div) },
 }
