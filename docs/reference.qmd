@@ -127,7 +127,7 @@ Use the plain name.
 
 ### Light and dark
 
-With Quarto 1.7.28 or later, a brand can define both:
+A brand can define both:
 
 ```yaml
 brand:
@@ -139,7 +139,7 @@ brand:
 [This adapts to the theme]{fg="fg" bg="bg"}
 ```
 
-Only HTML switches between them live.
+HTML and Reveal.js switch between them live.
 Every other format takes the light value, or the dark one when there is no light.
 
 ## Format support
@@ -171,7 +171,7 @@ format:
     pdf-engine: lualatex
 ```
 
-LuaLaTeX is the default from Quarto 1.8.
+LuaLaTeX is Quarto's default PDF engine.
 
 ## Limitations
 

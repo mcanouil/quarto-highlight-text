@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- build: Require Quarto 1.10.19 or later. (#98)
+
 ## 2.4.0 (2026-10-10)
 
 ### New Features

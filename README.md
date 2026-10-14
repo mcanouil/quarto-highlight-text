@@ -12,6 +12,8 @@ This will install the extension under the `_extensions` subdirectory.
 
 If you're using version control, you will want to check in this directory.
 
+The extension requires Quarto 1.10.19 or later.
+
 ## Documentation
 
 The full documentation lives at <https://m.canouil.dev/quarto-highlight-text/>: every attribute and its aliases, the accepted colour values, brand colours, light and dark themes, per-format support, and the LaTeX line-wrapping notes.
