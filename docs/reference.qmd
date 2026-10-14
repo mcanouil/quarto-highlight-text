@@ -139,7 +139,7 @@ brand:
 [This adapts to the theme]{fg="fg" bg="bg"}
 ```
 
-Only HTML switches between them live.
+HTML and Reveal.js switch between them live.
 Every other format takes the light value, or the dark one when there is no light.
 
 ## Format support

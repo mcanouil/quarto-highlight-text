@@ -23,6 +23,8 @@ quarto add {{< var extension.reference >}}
 This will install the extension under the `_extensions` subdirectory.
 If you are using version control, you will want to check in this directory.
 
+The extension requires Quarto 1.10.19 or later.
+
 Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto-wizard):
 
 ::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
