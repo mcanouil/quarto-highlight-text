@@ -127,7 +127,7 @@ Use the plain name.
 
 ### Light and dark
 
-With Quarto 1.7.28 or later, a brand can define both:
+A brand can define both:
 
 ```yaml
 brand:
@@ -171,7 +171,7 @@ format:
     pdf-engine: lualatex
 ```
 
-LuaLaTeX is the default from Quarto 1.8.
+LuaLaTeX is Quarto's default PDF engine.
 
 ## Limitations
 
