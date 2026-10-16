@@ -21,6 +21,8 @@ website:
   description: "A Quarto filter that colours text, backgrounds, and borders across HTML, LaTeX, Typst, Word, PowerPoint, RevealJS, and Beamer."
   # No trailing slash: Quarto builds the social image URL by concatenating this
   # with the image path, without normalising.
+  # quarto-dev/quarto-cli#15053 normalises this join. Drop this note once the
+  # minimum Quarto version is the first release after 1.11.6.
   site-url: &site-url https://m.canouil.dev/quarto-highlight-text
   repo-url: https://github.com/mcanouil/quarto-highlight-text
   open-graph:
