@@ -9,5 +9,5 @@ authors:
 repository-code: "https://github.com/mcanouil/quarto-highlight-text"
 url: "http://m.canouil.dev/quarto-highlight-text/"
 license: "MIT"
-date-released: "2026-10-10"
-version: 2.4.0
+date-released: "2026-10-16"
+version: 3.0.0
