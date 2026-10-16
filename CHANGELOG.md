@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-10-16)
+
 ### Breaking Changes
 
 - build: Require Quarto 1.10.19 or later. (#98)

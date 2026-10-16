@@ -5,7 +5,7 @@
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-highlight-text@2.4.0
+quarto add mcanouil/quarto-highlight-text@3.0.0
 ```
 
 This will install the extension under the `_extensions` subdirectory.
