@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: Skip brand colours when Quarto 2 has no `quarto.brand` or brand module, so the render does not stop.
+
 ## 3.0.0 (2026-10-16)
 
 ### Breaking Changes

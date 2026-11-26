@@ -94,7 +94,8 @@ end
 --- @param attribute string Human-readable attribute label used in warnings
 --- @return string|nil The processed colour value or nil when invalid
 local function get_brand_colour(theme, colour, attribute)
-  local brand = require('modules/brand/brand')
+  -- Quarto 2 has no `modules/brand/brand`, so brand colours are not looked up there.
+  local has_brand, brand = pcall(require, 'modules/brand/brand')
 
   if colour == nil then
     return nil
@@ -121,7 +122,7 @@ local function get_brand_colour(theme, colour, attribute)
     deprecation_warning_shown = true
   end
 
-  local brand_colour = brand.get_color(theme, brand_colour_key)
+  local brand_colour = has_brand and brand.get_color(theme, brand_colour_key) or nil
   if brand_colour ~= nil then
     return brand_colour
   end
@@ -1066,7 +1067,7 @@ end
 local function process_highlight_settings(colour, bg_colour, border_colour, border_style, opacity, gradient)
   local highlight_settings = {}
 
-  if quarto.brand.has_mode('light') or quarto.brand.has_mode('dark') then
+  if quarto.brand ~= nil and (quarto.brand.has_mode('light') or quarto.brand.has_mode('dark')) then
     local modes = { 'light', 'dark' }
     for _, mode in ipairs(modes) do
       if quarto.brand.has_mode(mode) then
